@@ -14,7 +14,7 @@ import json
 
 from .models import Lecturer, Unit, AttendanceSession
 from .forms import AttendanceSessionForm, StudentAttendanceForm, UnitForm
-from .firebase_service import firebase_service
+from .firebase_service import get_firebase_service
 from .qr_generator import generate_session_qr
 
 
@@ -42,8 +42,8 @@ def student_attend(request, session_id):
             admission_number = form.cleaned_data['admission_number']
             
             # Check if already marked
-            if firebase_service.is_connected:
-                if firebase_service.check_already_marked(str(session.id), admission_number):
+            if get_firebase_service().is_connected:
+                if get_firebase_service().check_already_marked(str(session.id), admission_number):
                     messages.warning(request, 'You have already marked attendance for this session!')
                     return render(request, 'attendance/already_marked.html', {
                         'session': session
@@ -62,7 +62,7 @@ def student_attend(request, session_id):
             }
             
             # Save to Firebase
-            result = firebase_service.save_attendance(str(session.id), student_data)
+            result = get_firebase_service().save_attendance(str(session.id), student_data)
             
             if result.get('success'):
                 return render(request, 'attendance/success.html', {
@@ -139,7 +139,7 @@ def session_detail(request, session_id):
     session = get_object_or_404(AttendanceSession, id=session_id)
     
     # Get attendance records from Firebase
-    attendance_records = firebase_service.get_session_attendance(str(session.id))
+    attendance_records = get_firebase_service().get_session_attendance(str(session.id))
     
     return render(request, 'attendance/session_detail.html', {
         'session': session,
@@ -235,7 +235,7 @@ def download_qr(request, session_id):
 def api_status(request):
     """Check system status."""
     return JsonResponse({
-        'firebase_connected': firebase_service.is_connected,
+        'firebase_connected': get_firebase_service().is_connected,
         'timestamp': timezone.now().isoformat(),
     })
 
