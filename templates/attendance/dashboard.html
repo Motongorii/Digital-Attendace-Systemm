@@ -1,0 +1,365 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Digital Attendance{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        padding: 2rem;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .welcome-text h1 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .welcome-text p {
+        color: var(--text-secondary);
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 80px;
+        height: 80px;
+        background: radial-gradient(circle, rgba(0, 255, 242, 0.1) 0%, transparent 70%);
+    }
+
+    .stat-value {
+        font-family: 'Orbitron', monospace;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-cyan);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.85rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .section-title::before {
+        content: '';
+        width: 4px;
+        height: 24px;
+        background: linear-gradient(180deg, var(--primary-cyan), var(--primary-purple));
+        border-radius: 2px;
+    }
+
+    .sessions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .session-card {
+        padding: 1.5rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .session-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 40px rgba(0, 255, 242, 0.1);
+    }
+
+    .session-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .session-unit {
+        font-family: 'Orbitron', monospace;
+        font-size: 1.2rem;
+        color: var(--primary-cyan);
+    }
+
+    .session-status {
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .status-active {
+        background: rgba(0, 255, 136, 0.2);
+        color: var(--success);
+        border: 1px solid var(--success);
+    }
+
+    .status-closed {
+        background: rgba(255, 51, 102, 0.2);
+        color: var(--error);
+        border: 1px solid var(--error);
+    }
+
+    .session-name {
+        font-size: 1rem;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+    }
+
+    .session-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .meta-item svg {
+        width: 16px;
+        height: 16px;
+        stroke: var(--primary-cyan);
+    }
+
+    .session-actions {
+        display: flex;
+        gap: 0.5rem;
+        border-top: 1px solid var(--glass-border);
+        padding-top: 1rem;
+    }
+
+    .session-actions .btn {
+        flex: 1;
+        padding: 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-secondary);
+    }
+
+    .empty-state svg {
+        width: 80px;
+        height: 80px;
+        stroke: var(--glass-border);
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .units-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .unit-tag {
+        padding: 0.5rem 1rem;
+        background: rgba(123, 44, 191, 0.2);
+        border: 1px solid var(--primary-purple);
+        border-radius: 50px;
+        font-size: 0.85rem;
+        color: var(--text-primary);
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .header-actions {
+            flex-direction: column;
+        }
+
+        .sessions-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container dashboard-container">
+    <div class="dashboard-header">
+        <div class="welcome-text">
+            <h1 class="neon-text">Welcome, {{ lecturer.user.first_name }}!</h1>
+            <p>{{ lecturer.department }} | Staff ID: {{ lecturer.staff_id }}</p>
+        </div>
+        <div class="header-actions">
+            <a href="{% url 'create_unit' %}" class="btn btn-secondary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                New Unit
+            </a>
+            <a href="{% url 'create_session' %}" class="btn btn-primary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"/>
+                    <rect x="14" y="3" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/>
+                    <line x1="17.5" y1="14" x2="17.5" y2="21"/>
+                    <line x1="14" y1="17.5" x2="21" y2="17.5"/>
+                </svg>
+                Create Session
+            </a>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="glass-card stat-card">
+            <div class="stat-value">{{ units.count }}</div>
+            <div class="stat-label">Total Units</div>
+        </div>
+        <div class="glass-card stat-card">
+            <div class="stat-value">{{ sessions.count }}</div>
+            <div class="stat-label">Total Sessions</div>
+        </div>
+        <div class="glass-card stat-card">
+            <div class="stat-value">{{ sessions|length }}</div>
+            <div class="stat-label">Active Sessions</div>
+        </div>
+    </div>
+
+    {% if units %}
+    <h2 class="section-title">Your Units</h2>
+    <div class="units-list">
+        {% for unit in units %}
+        <span class="unit-tag">{{ unit.code }} - {{ unit.name }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <h2 class="section-title">Recent Sessions</h2>
+    
+    {% if sessions %}
+    <div class="sessions-grid">
+        {% for session in sessions %}
+        <div class="glass-card session-card">
+            <div class="session-header">
+                <span class="session-unit">{{ session.unit.code }}</span>
+                <span class="session-status {% if session.is_active %}status-active{% else %}status-closed{% endif %}">
+                    {% if session.is_active %}Active{% else %}Closed{% endif %}
+                </span>
+            </div>
+            <div class="session-name">{{ session.unit.name }}</div>
+            <div class="session-meta">
+                <div class="meta-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    {{ session.date|date:"M d, Y" }}
+                </div>
+                <div class="meta-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    {{ session.start_time|time:"H:i" }}
+                </div>
+                <div class="meta-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    {{ session.venue }}
+                </div>
+            </div>
+            <div class="session-actions">
+                <a href="{% url 'session_detail' session.id %}" class="btn btn-secondary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    View
+                </a>
+                <a href="{% url 'toggle_session' session.id %}" class="btn {% if session.is_active %}btn-danger{% else %}btn-primary{% endif %}">
+                    {% if session.is_active %}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/>
+                        <line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>
+                    Close
+                    {% else %}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Open
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="glass-card empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        <h3>No Sessions Yet</h3>
+        <p>Create your first attendance session to get started.</p>
+        <a href="{% url 'create_session' %}" class="btn btn-primary" style="margin-top: 1rem;">
+            Create Session
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+
+

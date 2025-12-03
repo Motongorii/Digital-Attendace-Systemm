@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Session Closed - {{ session.unit.code }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .closed-container {
+        min-height: calc(100vh - 100px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .closed-card {
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+        padding: 3rem;
+    }
+
+    .closed-icon {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 2rem;
+        background: linear-gradient(135deg, rgba(255, 51, 102, 0.2), rgba(255, 51, 102, 0.1));
+        border: 3px solid var(--error);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .closed-icon svg {
+        width: 50px;
+        height: 50px;
+        stroke: var(--error);
+    }
+
+    .closed-title {
+        font-size: 2rem;
+        color: var(--error);
+        margin-bottom: 1rem;
+    }
+
+    .closed-message {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .session-info {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 1.5rem;
+        border-radius: 15px;
+        border: 1px solid var(--glass-border);
+        margin-bottom: 2rem;
+        text-align: left;
+    }
+
+    .session-info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+    }
+
+    .session-info-label {
+        color: var(--text-secondary);
+    }
+
+    .session-info-value {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="closed-container">
+    <div class="glass-card closed-card">
+        <div class="closed-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>
+        </div>
+
+        <h1 class="closed-title">Session Closed</h1>
+        <p class="closed-message">
+            This attendance session has been closed by the lecturer. 
+            You can no longer mark attendance for this class.
+        </p>
+
+        <div class="session-info">
+            <div class="session-info-row">
+                <span class="session-info-label">Unit</span>
+                <span class="session-info-value">{{ session.unit.code }} - {{ session.unit.name }}</span>
+            </div>
+            <div class="session-info-row">
+                <span class="session-info-label">Date</span>
+                <span class="session-info-value">{{ session.date|date:"D, M d, Y" }}</span>
+            </div>
+            <div class="session-info-row">
+                <span class="session-info-label">Lecturer</span>
+                <span class="session-info-value">{{ session.lecturer.user.get_full_name }}</span>
+            </div>
+        </div>
+
+        <a href="{% url 'home' %}" class="btn btn-secondary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            Return Home
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+
+
+

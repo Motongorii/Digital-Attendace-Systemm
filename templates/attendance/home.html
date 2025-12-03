@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+
+{% block title %}Digital Attendance System - Home{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero {
+        min-height: calc(100vh - 100px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+    }
+
+    .hero-content {
+        max-width: 900px;
+        padding: 2rem;
+    }
+
+    .hero-title {
+        font-size: 4rem;
+        font-weight: 900;
+        margin-bottom: 1.5rem;
+        line-height: 1.1;
+    }
+
+    .hero-subtitle {
+        font-size: 1.5rem;
+        color: var(--text-secondary);
+        margin-bottom: 3rem;
+        font-weight: 300;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 4rem;
+    }
+
+    .feature-card {
+        text-align: center;
+        padding: 2.5rem;
+    }
+
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, rgba(0, 255, 242, 0.1), rgba(123, 44, 191, 0.1));
+        border-radius: 20px;
+        border: 1px solid var(--glass-border);
+    }
+
+    .feature-icon svg {
+        width: 40px;
+        height: 40px;
+        stroke: var(--primary-cyan);
+    }
+
+    .feature-title {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+    }
+
+    .feature-desc {
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    /* Floating particles */
+    .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: var(--primary-cyan);
+        border-radius: 50%;
+        animation: float 15s infinite ease-in-out;
+        opacity: 0.5;
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(100vh) rotate(0deg);
+            opacity: 0;
+        }
+        10% {
+            opacity: 0.5;
+        }
+        90% {
+            opacity: 0.5;
+        }
+        100% {
+            transform: translateY(-100vh) rotate(720deg);
+            opacity: 0;
+        }
+    }
+
+    .scan-animation {
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        border: 2px solid var(--primary-cyan);
+        border-radius: 20px;
+        opacity: 0.3;
+    }
+
+    .scan-animation::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, var(--primary-cyan), transparent);
+        animation: scan 2s ease-in-out infinite;
+    }
+
+    @keyframes scan {
+        0%, 100% {
+            top: 0;
+        }
+        50% {
+            top: calc(100% - 3px);
+        }
+    }
+
+    .qr-demo {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 3rem;
+    }
+
+    .qr-placeholder {
+        width: 150px;
+        height: 150px;
+        background: linear-gradient(135deg, var(--card-bg), rgba(0, 255, 242, 0.1));
+        border: 2px solid var(--primary-cyan);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            box-shadow: 0 0 20px rgba(0, 255, 242, 0.3);
+        }
+        50% {
+            box-shadow: 0 0 40px rgba(0, 255, 242, 0.6);
+        }
+    }
+
+    .qr-placeholder svg {
+        width: 60px;
+        height: 60px;
+        stroke: var(--primary-cyan);
+    }
+
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="particles">
+    {% for i in "123456789012345" %}
+    <div class="particle" style="left: {{ forloop.counter|add:5 }}%; animation-delay: {{ forloop.counter }}s;"></div>
+    {% endfor %}
+</div>
+
+<section class="hero">
+    <div class="hero-content">
+        <div class="qr-demo">
+            <div class="qr-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"/>
+                    <rect x="14" y="3" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/>
+                    <rect x="14" y="14" width="7" height="7"/>
+                </svg>
+            </div>
+        </div>
+
+        <h1 class="hero-title neon-text">Digital Attendance System</h1>
+        <p class="hero-subtitle">
+            Revolutionize classroom attendance with QR code technology. 
+            Scan, verify, and track—all in seconds.
+        </p>
+
+        <div class="hero-buttons">
+            <a href="{% url 'login' %}" class="btn btn-primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+                Lecturer Portal
+            </a>
+            <a href="#features" class="btn btn-secondary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 16 16 12 12 8"/>
+                    <line x1="8" y1="12" x2="16" y2="12"/>
+                </svg>
+                Learn More
+            </a>
+        </div>
+    </div>
+</section>
+
+<section id="features" class="container" style="padding-bottom: 4rem;">
+    <h2 class="text-center neon-text mb-4" style="font-size: 2.5rem;">How It Works</h2>
+    
+    <div class="feature-grid">
+        <div class="glass-card feature-card">
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <path d="M7 7h3v3H7z"/>
+                    <path d="M14 7h3v3h-3z"/>
+                    <path d="M7 14h3v3H7z"/>
+                    <path d="M14 14h3v3h-3z"/>
+                </svg>
+            </div>
+            <h3 class="feature-title">Generate QR Code</h3>
+            <p class="feature-desc">
+                Lecturers create attendance sessions and generate unique QR codes 
+                embedded with unit, time, and venue information.
+            </p>
+        </div>
+
+        <div class="glass-card feature-card">
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                    <path d="M6 8h.01"/>
+                    <path d="M10 8h.01"/>
+                    <path d="M14 8h.01"/>
+                    <path d="M6 12h.01"/>
+                    <path d="M10 12h.01"/>
+                    <path d="M14 12h.01"/>
+                    <path d="M18 12h.01"/>
+                </svg>
+            </div>
+            <h3 class="feature-title">Scan & Access</h3>
+            <p class="feature-desc">
+                Students scan the QR code with their phones to access 
+                the attendance form with pre-filled session details.
+            </p>
+        </div>
+
+        <div class="glass-card feature-card">
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+            </div>
+            <h3 class="feature-title">Mark Attendance</h3>
+            <p class="feature-desc">
+                Students enter their name and admission number. 
+                Data is instantly saved to Firebase cloud database.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+
+

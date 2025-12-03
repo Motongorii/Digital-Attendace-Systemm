@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Unit - Digital Attendance{% endblock %}
+
+{% block extra_css %}
+<style>
+    .create-container {
+        min-height: calc(100vh - 100px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .create-card {
+        max-width: 500px;
+        width: 100%;
+        position: relative;
+    }
+
+    .create-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .create-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(135deg, rgba(123, 44, 191, 0.2), rgba(255, 0, 255, 0.1));
+        border-radius: 20px;
+        border: 1px solid var(--glass-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .create-icon svg {
+        width: 35px;
+        height: 35px;
+        stroke: var(--primary-magenta);
+    }
+
+    .create-title {
+        font-size: 1.6rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .create-subtitle {
+        color: var(--text-secondary);
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 1.25rem;
+        font-size: 1.1rem;
+        margin-top: 1rem;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        margin-bottom: 1.5rem;
+        transition: color 0.3s ease;
+    }
+
+    .back-link:hover {
+        color: var(--primary-cyan);
+    }
+
+    .corner-accent {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border: 2px solid var(--primary-magenta);
+    }
+
+    .corner-accent.tl {
+        top: -1px;
+        left: -1px;
+        border-right: none;
+        border-bottom: none;
+        border-radius: 20px 0 0 0;
+    }
+
+    .corner-accent.tr {
+        top: -1px;
+        right: -1px;
+        border-left: none;
+        border-bottom: none;
+        border-radius: 0 20px 0 0;
+    }
+
+    .corner-accent.bl {
+        bottom: -1px;
+        left: -1px;
+        border-right: none;
+        border-top: none;
+        border-radius: 0 0 0 20px;
+    }
+
+    .corner-accent.br {
+        bottom: -1px;
+        right: -1px;
+        border-left: none;
+        border-top: none;
+        border-radius: 0 0 20px 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="create-container">
+    <div>
+        <a href="{% url 'dashboard' %}" class="back-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"/>
+                <polyline points="12 19 5 12 12 5"/>
+            </svg>
+            Back to Dashboard
+        </a>
+
+        <div class="glass-card create-card">
+            <div class="corner-accent tl"></div>
+            <div class="corner-accent tr"></div>
+            <div class="corner-accent bl"></div>
+            <div class="corner-accent br"></div>
+
+            <div class="create-header">
+                <div class="create-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                        <line x1="12" y1="6" x2="12" y2="12"/>
+                        <line x1="9" y1="9" x2="15" y2="9"/>
+                    </svg>
+                </div>
+                <h1 class="create-title neon-text">Add New Unit</h1>
+                <p class="create-subtitle">Create a course unit for attendance tracking</p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="form-label" for="id_code">Unit Code</label>
+                    {{ form.code }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_name">Unit Name</label>
+                    {{ form.name }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_description">Description (Optional)</label>
+                    {{ form.description }}
+                </div>
+
+                <button type="submit" class="btn btn-primary submit-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    Create Unit
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
