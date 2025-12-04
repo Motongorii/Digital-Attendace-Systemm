@@ -4,6 +4,41 @@
 
 {% block extra_css %}
 <style>
+    .creation-banner {
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 255, 242, 0.2));
+        border: 2px solid var(--success);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        animation: slideIn 0.5s ease-out;
+    }
+
+    .creation-banner svg {
+        width: 24px;
+        height: 24px;
+        stroke: var(--success);
+        flex-shrink: 0;
+    }
+
+    .creation-banner-text {
+        color: var(--success);
+        font-size: 0.95rem;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     .detail-container {
         padding: 2rem;
     }
@@ -112,6 +147,8 @@
     .qr-card {
         padding: 2rem;
         text-align: center;
+        position: sticky;
+        top: 2rem;
     }
 
     .qr-title {
@@ -129,6 +166,7 @@
         border-radius: 15px;
         margin-bottom: 1.5rem;
         display: inline-block;
+        box-shadow: 0 0 30px rgba(0, 255, 242, 0.3);
     }
 
     .qr-container img {
@@ -232,6 +270,16 @@
         margin-bottom: 1rem;
     }
 
+    .refresh-indicator {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-top: 1rem;
+    }
+
+    .refresh-indicator.updating {
+        color: var(--primary-cyan);
+    }
+
     @media (max-width: 1024px) {
         .detail-grid {
             grid-template-columns: 1fr;
@@ -239,6 +287,8 @@
 
         .qr-card {
             order: -1;
+            position: relative;
+            top: auto;
         }
     }
 
@@ -251,7 +301,12 @@
             flex-direction: column;
         }
 
-        .action-buttons .btn {
+        .creation-banner {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .btn {
             width: 100%;
         }
     }
@@ -268,11 +323,24 @@
         Back to Dashboard
     </a>
 
+    <!-- Success Banner if Session Just Created -->
+    {% if messages %}
+        <div class="creation-banner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            <div class="creation-banner-text">
+                ✓ Session created successfully! QR code generated. Share this QR code with students to mark attendance.
+            </div>
+        </div>
+    {% endif %}
+
     <div class="detail-grid">
         <div class="glass-card session-info-card">
             <div class="info-header">
                 <div>
-                    <div class="unit-code">{{ session.unit.code }}</div>
+                    <div class="unit-code">{{ session.unit.code }}{% if session.session_number %} - S{{ session.semester }} Lec {{ session.session_number }}{% endif %}</div>
                     <div class="unit-name">{{ session.unit.name }}</div>
                 </div>
                 <span class="status-badge {% if session.is_active %}status-active{% else %}status-closed{% endif %}">
@@ -283,7 +351,11 @@
             <div class="info-grid">
                 <div class="info-item">
                     <div class="info-item-label">Lecturer</div>
-                    <div class="info-item-value">{{ session.lecturer.user.get_full_name }}</div>
+                    <div class="info-item-value">{{ session.lecturer_name }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-item-label">Class</div>
+                    <div class="info-item-value">{{ session.class_year }}</div>
                 </div>
                 <div class="info-item">
                     <div class="info-item-label">Date</div>
@@ -296,6 +368,10 @@
                 <div class="info-item">
                     <div class="info-item-label">Venue</div>
                     <div class="info-item-value">{{ session.venue }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-item-label">Semester</div>
+                    <div class="info-item-value">S{{ session.semester }}</div>
                 </div>
             </div>
 
@@ -310,7 +386,8 @@
                     Close Session
                     {% else %}
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="20 6 9 17 4 12"/>
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 16 16 12 12 8 8 12 12 16"/>
                     </svg>
                     Reopen Session
                     {% endif %}
@@ -325,33 +402,38 @@
                 </a>
             </div>
 
-            <div class="attendance-section">
+            <div class="attendance-section glass-card" style="margin-top: 2rem; padding: 1.5rem; margin-left: -1.5rem; margin-right: -1.5rem; margin-bottom: -1.5rem;">
                 <div class="section-header">
-                    <h2 class="section-title">Attendance Records</h2>
-                    <span class="count-badge">{{ attendance_count }} students</span>
+                    <div class="section-title">📊 Real-time Attendance</div>
+                    <span class="count-badge"><span id="attendance-count">{{ attendance_count }}</span> students</span>
                 </div>
-
+                
                 {% if attendance_records %}
-                <table class="attendance-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Student Name</th>
-                            <th>Admission No.</th>
-                            <th>Time Marked</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for record in attendance_records %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ record.student_name }}</td>
-                            <td>{{ record.admission_number }}</td>
-                            <td>{{ record.timestamp|slice:":19" }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div style="overflow-x: auto;">
+                    <table class="attendance-table">
+                        <thead>
+                            <tr>
+                                <th>Admission</th>
+                                <th>Student Name</th>
+                                <th>Timestamp</th>
+                                <th>Attendance %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendance-body">
+                            {% for record in attendance_records %}
+                            <tr>
+                                <td><code>{{ record.admission_number }}</code></td>
+                                <td><strong>{{ record.student_name }}</strong></td>
+                                <td><small>{{ record.timestamp|slice:"-8:" }}</small></td>
+                                <td><strong>{{ record.attendance_percentage|floatformat:1 }}%</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="refresh-indicator" id="refresh-status">
+                    ♻️ Auto-refreshing every 3 seconds...
+                </div>
                 {% else %}
                 <div class="glass-card empty-attendance">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
@@ -361,13 +443,14 @@
                         <line x1="22" y1="11" x2="16" y2="11"/>
                     </svg>
                     <p>No attendance records yet</p>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary);">Students will appear here as they scan the QR code</p>
                 </div>
                 {% endif %}
             </div>
         </div>
 
         <div class="glass-card qr-card">
-            <div class="qr-title">// Session QR Code</div>
+            <div class="qr-title">📱 QR Code</div>
             <div class="qr-container">
                 {% if session.qr_code %}
                 <img src="{{ session.qr_code.url }}" alt="QR Code for {{ session.unit.code }}">
@@ -378,8 +461,8 @@
             <div class="qr-url">
                 {{ request.scheme }}://{{ request.get_host }}/attend/{{ session.id }}/
             </div>
-            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">
-                Students scan this QR code to mark their attendance
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                ✓ Students scan this QR code to mark attendance instantly
             </p>
             <a href="{% url 'download_qr' session.id %}" class="btn btn-primary" style="width: 100%;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -392,6 +475,37 @@
         </div>
     </div>
 </div>
+
+<script>
+// Auto-refresh attendance data every 3 seconds
+const sessionId = "{{ session.id }}";
+let refreshInterval;
+
+function refreshAttendance() {
+    fetch(`/api/status/?session_id=${sessionId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.attendance_count !== undefined) {
+                document.getElementById('attendance-count').textContent = data.attendance_count;
+            }
+            // Visual feedback that we're updating
+            const indicator = document.getElementById('refresh-status');
+            if (indicator) {
+                indicator.classList.add('updating');
+                setTimeout(() => indicator.classList.remove('updating'), 200);
+            }
+        })
+        .catch(error => console.log('Auto-refresh paused'));
+}
+
+// Start auto-refresh
+refreshInterval = setInterval(refreshAttendance, 3000);
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (refreshInterval) clearInterval(refreshInterval);
+});
+</script>
 {% endblock %}
 
 

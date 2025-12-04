@@ -10,8 +10,18 @@ class AttendanceSessionForm(forms.ModelForm):
     
     class Meta:
         model = AttendanceSession
-        fields = ['unit', 'date', 'start_time', 'end_time', 'venue']
+        fields = ['unit', 'lecturer_name', 'class_year', 'semester', 'date', 'start_time', 'end_time', 'venue']
         widgets = {
+            'lecturer_name': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Enter lecturer name (e.g., Dr. John Doe)'
+            }),
+            'class_year': forms.Select(attrs={
+                'class': 'form-input'
+            }),
+            'semester': forms.Select(attrs={
+                'class': 'form-input'
+            }),
             'date': forms.DateInput(attrs={
                 'type': 'date',
                 'class': 'form-input'

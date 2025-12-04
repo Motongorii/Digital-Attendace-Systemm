@@ -11,6 +11,8 @@ from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from django.conf import settings
 import json
+import threading
+from django.core.cache import cache
 
 from .models import Lecturer, Unit, AttendanceSession, Student, Attendance
 from .forms import AttendanceSessionForm, StudentAttendanceForm, UnitForm
@@ -78,22 +80,28 @@ def student_attend(request, session_id):
             if session.unit not in student.units.all():
                 student.units.add(session.unit)
             
-            # Sync to both Firebase and Portal
-            sync_result = get_dual_sync_service().sync_attendance(student, session)
-            
-            if sync_result.get('success'):
-                attendance_percentage = sync_result.get('attendance_percentage', 0)
-                return render(request, 'attendance/success.html', {
-                    'session': session,
-                    'student_name': student_name,
-                    'attendance_percentage': attendance_percentage,
-                })
-            else:
-                error_msg = (
-                    sync_result.get('error') or 
-                    'Failed to sync attendance. Please try again.'
-                )
-                messages.error(request, f"Error recording attendance: {error_msg}")
+            # Create or get local attendance record immediately (fast response)
+            from .models import Attendance as _Attendance
+            attendance, created = _Attendance.objects.get_or_create(student=student, session=session)
+            attendance_percentage = attendance.get_attendance_percentage()
+
+            # Background sync to Firebase and Portal (non-blocking)
+            import threading
+            def _bg_sync(att_id):
+                try:
+                    from .models import Attendance as __Attendance
+                    from .sync_service import get_dual_sync_service
+                    att = __Attendance.objects.get(id=att_id)
+                    get_dual_sync_service().sync_attendance(att.student, att.session)
+                except Exception:
+                    pass
+            threading.Thread(target=_bg_sync, args=(attendance.id,), daemon=True).start()
+
+            return render(request, 'attendance/success.html', {
+                'session': session,
+                'student_name': student_name,
+                'attendance_percentage': attendance_percentage,
+            })
     else:
         form = StudentAttendanceForm()
     
@@ -112,7 +120,10 @@ def lecturer_dashboard(request):
         messages.error(request, 'You are not registered as a lecturer.')
         return redirect('home')
     
-    sessions = AttendanceSession.objects.filter(lecturer=lecturer)
+    # Optimize queries with select_related to avoid N+1 problem
+    sessions = AttendanceSession.objects.filter(lecturer=lecturer).select_related(
+        'unit', 'lecturer'
+    ).order_by('-created_at')
     units = Unit.objects.filter(lecturer=lecturer)
     
     return render(request, 'attendance/dashboard.html', {
@@ -136,38 +147,105 @@ def create_session(request):
         form.fields['unit'].queryset = Unit.objects.filter(lecturer=lecturer)
         
         if form.is_valid():
-            session = form.save(commit=False)
-            session.lecturer = lecturer
-            session.save()
-            
-            # Generate QR code
-            # Build a base URL that is reachable from other devices on the same network.
-            # If the request host is localhost/127.0.0.1 we attempt to detect the machine LAN IP
-            base_url = request.build_absolute_uri('/')[:-1]
             try:
-                host = request.get_host().split(':')[0]
-            except Exception:
-                host = ''
-
-            if host in ('127.0.0.1', 'localhost') or host == '' or settings.DEBUG:
+                session = form.save(commit=False)
+                session.lecturer = lecturer
+                
+                # Check if a duplicate session already exists (same unit, semester, date, time)
+                existing_same_time = AttendanceSession.objects.filter(
+                    unit=session.unit,
+                    semester=session.semester,
+                    date=session.date,
+                    start_time=session.start_time
+                ).exists()
+                if existing_same_time:
+                    messages.error(request, 'A session for this unit and semester at the same date/time already exists.')
+                    form.add_error(None, 'Duplicate session time detected.')
+                    return render(request, 'attendance/create_session.html', {'form': form})
+                
+                # Assign the next available session_number (1..13) for this unit and semester
+                used_numbers = set(
+                    AttendanceSession.objects.filter(
+                        unit=session.unit,
+                        semester=session.semester
+                    ).exclude(session_number__isnull=True).values_list('session_number', flat=True)
+                )
+                next_num = None
+                for n in range(1, 14):
+                    if n not in used_numbers:
+                        next_num = n
+                        break
+                
+                if not next_num:
+                    messages.error(request, f'This unit already has 13 sessions for Semester {session.semester}. Cannot add more.')
+                    form.add_error(None, 'Maximum sessions (13) reached for this semester.')
+                    return render(request, 'attendance/create_session.html', {'form': form})
+                
+                session.session_number = next_num
+                session.save()
+                
+                # Generate QR code
+                # Build a base URL that is reachable from other devices on the same network.
+                # Detect the actual LAN IP from the request if available
+                base_url = request.build_absolute_uri('/')[:-1]
                 try:
-                    import socket
-                    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                    # doesn't have to be reachable; used only to pick the outbound interface
-                    s.connect(('8.8.8.8', 80))
-                    local_ip = s.getsockname()[0]
-                    s.close()
-                    port = request.get_port()
-                    base_url = f"http://{local_ip}:{port}"
+                    host = request.get_host().split(':')[0]
                 except Exception:
-                    # fallback to the original build_absolute_uri
-                    base_url = request.build_absolute_uri('/')[:-1]
+                    host = ''
 
-            qr_file = generate_session_qr(session, base_url)
-            session.qr_code.save(qr_file.name, qr_file)
+                # If running on localhost or 0.0.0.0, detect the actual LAN IP
+                if host in ('127.0.0.1', 'localhost', '0.0.0.0') or host == '' or settings.DEBUG:
+                    try:
+                        import socket
+                        import subprocess
+                        
+                        # First, try to get the LAN IP by parsing ipconfig output (Windows)
+                        local_ip = None
+                        try:
+                            result = subprocess.run(['ipconfig'], capture_output=True, text=True, timeout=5)
+                            # Look for Wi-Fi adapter's IPv4 Address
+                            for line in result.stdout.split('\n'):
+                                if 'IPv4 Address' in line and '192.168' in line:
+                                    parts = line.split(':')
+                                    if len(parts) > 1:
+                                        local_ip = parts[1].strip()
+                                        break
+                        except Exception:
+                            pass
+                        
+                        # Fallback: use socket method
+                        if not local_ip:
+                            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                            try:
+                                # Connect to a remote host (doesn't need to be reachable)
+                                s.connect(('1.1.1.1', 80))
+                                local_ip = s.getsockname()[0]
+                            finally:
+                                s.close()
+                        
+                        if local_ip and local_ip != '127.0.0.1':
+                            port = request.get_port()
+                            base_url = f"http://{local_ip}:{port}"
+                    except Exception:
+                        # If all detection fails, use the original URL
+                        base_url = request.build_absolute_uri('/')[:-1]
+
+                # Generate and save QR code
+                qr_file = generate_session_qr(session, base_url)
+                session.qr_code.save(qr_file.name, qr_file)
+                
+                # Add success message and redirect to session detail
+                messages.success(request, 'Session created successfully! QR code generated.')
+                return redirect('session_detail', session_id=session.id)
             
-            messages.success(request, 'Session created successfully!')
-            return redirect('session_detail', session_id=session.id)
+            except Exception as e:
+                messages.error(request, f'Error creating session: {str(e)}')
+                import traceback
+                traceback.print_exc()
+                return render(request, 'attendance/create_session.html', {'form': form})
+        else:
+            # Form is not valid
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = AttendanceSessionForm()
         form.fields['unit'].queryset = Unit.objects.filter(lecturer=lecturer)
@@ -180,42 +258,64 @@ def create_session(request):
 @login_required
 def session_detail(request, session_id):
     """View session details and QR code."""
-    session = get_object_or_404(AttendanceSession, id=session_id)
+    # Optimize with select_related to avoid N+1 queries
+    session = get_object_or_404(
+        AttendanceSession.objects.select_related('unit', 'lecturer', 'lecturer__user'),
+        id=session_id
+    )
     
     # Get attendance records from Firebase (fallback to local DB if empty)
     fb_service = get_firebase_service()
     attendance_records = []
     attendance_count = 0
-    if fb_service.is_connected:
-        try:
-            attendance_records = fb_service.get_session_attendance(str(session.id)) or []
-            attendance_count = len(attendance_records)
-        except Exception:
-            attendance_records = []
-            attendance_count = 0
+    
+    # Check cache first
+    cache_key = f"session_attendance_{session.id}"
+    cached_records = cache.get(cache_key)
+    
+    if cached_records is None and fb_service.is_connected:
+        # Fetch from Firebase with timeout
+        def fetch_firebase():
+            try:
+                records = fb_service.get_session_attendance(str(session.id)) or []
+                cache.set(cache_key, records, 5)  # Cache for 5 seconds
+                return records
+            except Exception:
+                return []
+        
+        thread = threading.Thread(target=fetch_firebase, daemon=True)
+        thread.start()
+        thread.join(timeout=2)  # Wait max 2 seconds for Firebase
+        
+        attendance_records = cached_records or []
+    else:
+        attendance_records = cached_records or []
+    
+    attendance_count = len(attendance_records)
 
-    # Supplement with local DB records (avoid duplicates)
-    local_qs = Attendance.objects.filter(session=session).select_related('student')
-    if local_qs.exists():
-        existing_adms = {r.get('admission_number') for r in attendance_records if isinstance(r, dict)}
-        for att in local_qs:
-            if att.student.admission_number in existing_adms:
-                continue
-            attendance_records.append({
-                'session_id': str(session.id),
-                'student_name': att.student.name,
-                'admission_number': att.student.admission_number,
-                'unit_code': session.unit.code,
-                'unit_name': session.unit.name,
-                'lecturer_name': session.lecturer.user.get_full_name(),
-                'date': str(session.date),
-                'time_slot': f"{session.start_time} - {session.end_time}",
-                'venue': session.venue,
-                'timestamp': att.timestamp.isoformat(),
-                'attendance_percentage': float(att.get_attendance_percentage()),
-            })
-        attendance_count = len(attendance_records)
+    # Load from local DB (fastest)
 
+    local_qs = Attendance.objects.filter(session=session).select_related('student').only(
+        'id', 'student__name', 'student__admission_number', 'timestamp'
+    ).order_by('-timestamp')[:100]  # Limit to last 100 for performance
+    
+    attendance_records = []
+    for att in local_qs:
+        attendance_pct = att.student.get_attendance_percentage(unit=session.unit)
+        attendance_records.append({
+            'session_id': str(session.id),
+            'student_name': att.student.name,
+            'admission_number': att.student.admission_number,
+            'unit_code': session.unit.code,
+            'unit_name': session.unit.name,
+            'lecturer_name': session.lecturer.user.get_full_name(),
+            'date': str(session.date),
+            'time_slot': f"{session.start_time} - {session.end_time}",
+            'venue': session.venue,
+            'timestamp': att.timestamp.isoformat(),
+            'attendance_percentage': float(attendance_pct) if attendance_pct else 0,
+        })
+    attendance_count = len(attendance_records)
     return render(request, 'attendance/session_detail.html', {
         'session': session,
         'attendance_records': attendance_records,
@@ -309,9 +409,29 @@ def download_qr(request, session_id):
 # API endpoint for checking Firebase status
 def api_status(request):
     """Check system status."""
+
+    session_id = request.GET.get('session_id')
+    attendance_count = None
+    if session_id:
+        try:
+            session = AttendanceSession.objects.get(id=session_id)
+            fb_service = get_firebase_service()
+            count = 0
+            if fb_service.is_connected:
+                try:
+                    records = fb_service.get_session_attendance(str(session.id)) or []
+                    count = len(records)
+                except Exception:
+                    count = 0
+            # Supplement with local DB records
+            local_count = Attendance.objects.filter(session=session).count()
+            attendance_count = max(count, local_count)
+        except AttendanceSession.DoesNotExist:
+            attendance_count = None
     return JsonResponse({
         'firebase_connected': get_firebase_service().is_connected,
         'timestamp': timezone.now().isoformat(),
+        'attendance_count': attendance_count,
     })
 
 

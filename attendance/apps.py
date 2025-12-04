@@ -9,3 +9,10 @@ class AttendanceConfig(AppConfig):
     name = 'attendance'
     verbose_name = 'Digital Attendance System'
 
+    def ready(self):
+        # Import signals to ensure post_save handlers are connected
+        try:
+            from . import signals  # noqa: F401
+        except Exception:
+            pass
+

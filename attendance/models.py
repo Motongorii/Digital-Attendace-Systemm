@@ -32,6 +32,8 @@ class Unit(models.Model):
 
 class AttendanceSession(models.Model):
     """A single attendance session for a unit."""
+    SEMESTER_CHOICES = [(1, 'Semester 1'), (2, 'Semester 2')]
+    
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name='sessions')
     lecturer = models.ForeignKey(Lecturer, on_delete=models.CASCADE, related_name='sessions')
@@ -39,15 +41,32 @@ class AttendanceSession(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     venue = models.CharField(max_length=100)
+    lecturer_name = models.CharField(max_length=100, help_text="Lecturer's name as entered for this session", blank=True)
+    CLASS_YEAR_CHOICES = [
+        ("Year 1", "Year 1"),
+        ("Year 2", "Year 2"),
+        ("Year 3", "Year 3"),
+        ("Year 4", "Year 4"),
+        ("Year 5", "Year 5"),
+    ]
+    class_year = models.CharField(max_length=20, choices=CLASS_YEAR_CHOICES, default="Year 1")
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     qr_code = models.FileField(upload_to='qr_codes/', blank=True, null=True)
+    semester = models.PositiveSmallIntegerField(choices=SEMESTER_CHOICES, default=1)
+    session_number = models.PositiveSmallIntegerField(blank=True, null=True, validators=[MinValueValidator(1), MaxValueValidator(13)])
     
     class Meta:
-        ordering = ['-date', '-start_time']
+        ordering = ['unit__code', 'semester', 'session_number', 'date', 'start_time']
+        constraints = [
+            models.UniqueConstraint(fields=['unit', 'semester', 'session_number'], name='unique_unit_semester_session'),
+            models.UniqueConstraint(fields=['unit', 'semester', 'date', 'start_time'], name='unique_unit_semester_datetime')
+        ]
     
     def __str__(self):
-        return f"{self.unit.code} - {self.date} ({self.start_time})"
+        if self.session_number:
+            return f"{self.unit.code} - S{self.semester} Lec {self.session_number} - {self.date} ({self.start_time})"
+        return f"{self.unit.code} - S{self.semester} - {self.date} ({self.start_time})"
     
     def get_session_info(self):
         """Return session info for QR code."""

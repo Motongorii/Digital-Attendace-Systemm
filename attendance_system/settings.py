@@ -60,11 +60,32 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'attendance_system.wsgi.application'
 
-# Database
+# Caching Configuration (In-Memory Cache for Speed)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'attendance-cache',
+        'TIMEOUT': 300,  # Cache for 5 minutes
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000
+        }
+    }
+}
+
+# Session Configuration (Use Cache Backend for speed)
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
+
+
+# Database (Optimized with connection pooling)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'CONN_MAX_AGE': 600,  # Keep database connections alive for 10 minutes
+        'OPTIONS': {
+            'timeout': 20,  # Database lock timeout in seconds
+        }
     }
 }
 
