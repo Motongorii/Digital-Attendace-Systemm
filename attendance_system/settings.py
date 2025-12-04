@@ -60,17 +60,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'attendance_system.wsgi.application'
 
-# Database - Using SQLite for local, temp dir for Vercel
-import tempfile
+# Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.getenv('DATABASE_URL', str(BASE_DIR / 'db.sqlite3')),
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-# On Vercel, use /tmp for database to avoid ephemeral filesystem issues
-if os.getenv('VERCEL'):
-    DATABASES['default']['NAME'] = '/tmp/db.sqlite3'
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

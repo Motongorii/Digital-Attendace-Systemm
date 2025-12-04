@@ -1,455 +1,159 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Digital Attendance System{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/modern.css' %}">
     <style>
-        :root {
-            --primary-cyan: #00fff2;
-            --primary-magenta: #ff00ff;
-            --primary-purple: #7b2cbf;
-            --dark-bg: #0a0a0f;
-            --darker-bg: #050508;
-            --card-bg: rgba(15, 15, 25, 0.85);
-            --glass-border: rgba(0, 255, 242, 0.15);
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.7);
-            --success: #00ff88;
-            --warning: #ffaa00;
-            --error: #ff3366;
-            --glow-cyan: 0 0 30px rgba(0, 255, 242, 0.5);
-            --glow-magenta: 0 0 30px rgba(255, 0, 255, 0.5);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Rajdhani', sans-serif;
-            background: var(--dark-bg);
-            color: var(--text-primary);
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
-
-        /* Animated Background */
-        .bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-        }
-
-        .bg-animation::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(123, 44, 191, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(0, 255, 242, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(255, 0, 255, 0.05) 0%, transparent 50%);
-            animation: bgRotate 30s linear infinite;
-        }
-
-        @keyframes bgRotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* Grid Lines */
-        .grid-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background-image: 
-                linear-gradient(rgba(0, 255, 242, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 242, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: gridMove 20s linear infinite;
-        }
-
-        @keyframes gridMove {
-            from { transform: translateY(0); }
-            to { transform: translateY(50px); }
-        }
-
-        /* Scanlines Effect */
-        .scanlines {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1000;
-            pointer-events: none;
-            background: repeating-linear-gradient(
-                0deg,
-                rgba(0, 0, 0, 0.1) 0px,
-                rgba(0, 0, 0, 0.1) 1px,
-                transparent 1px,
-                transparent 3px
-            );
-            opacity: 0.3;
-        }
-
-        /* Navigation */
-        .nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
+        
+        .navbar {
+            background: rgba(15, 23, 42, 0.8) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
             padding: 1rem 2rem;
-            background: linear-gradient(180deg, rgba(10, 10, 15, 0.95) 0%, transparent 100%);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
-
-        .nav-logo {
-            font-family: 'Orbitron', monospace;
+        
+        .navbar-brand {
+            font-family: 'Poppins', sans-serif;
             font-size: 1.5rem;
             font-weight: 700;
-            background: linear-gradient(90deg, var(--primary-cyan), var(--primary-magenta));
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: var(--glow-cyan);
-            letter-spacing: 3px;
+            background-clip: text;
         }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 1rem;
+        
+        .nav-link {
+            color: #94a3b8 !important;
             font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 2px;
             transition: all 0.3s ease;
-            position: relative;
+            margin-left: 1rem;
+            border-radius: 8px;
+        }
+        
+        .nav-link:hover {
+            color: #e2e8f0 !important;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 0.5rem 1rem;
         }
 
-        .nav-links a:hover {
-            color: var(--primary-cyan);
-            text-shadow: var(--glow-cyan);
+        main {
+            min-height: calc(100vh - 200px);
+            padding: 3rem 0;
         }
 
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary-cyan);
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        /* Main Content */
-        .main-content {
-            padding-top: 100px;
-            min-height: 100vh;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Glass Card */
-        .glass-card {
-            background: var(--card-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            backdrop-filter: blur(20px);
+        footer {
+            background: rgba(15, 23, 42, 0.8);
+            border-top: 1px solid rgba(148, 163, 184, 0.1);
             padding: 2rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .glass-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--primary-cyan), transparent);
-        }
-
-        /* Form Styles */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.85rem;
-            color: var(--primary-cyan);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 0.5rem;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 1rem 1.25rem;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary-cyan);
-            box-shadow: 0 0 20px rgba(0, 255, 242, 0.2);
-        }
-
-        .form-input::placeholder {
-            color: var(--text-secondary);
-        }
-
-        /* Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 1rem 2rem;
-            font-family: 'Orbitron', monospace;
-            font-size: 1rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-cyan), var(--primary-purple));
-            color: var(--dark-bg);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--glow-cyan);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            border: 2px solid var(--primary-cyan);
-            color: var(--primary-cyan);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(0, 255, 242, 0.1);
-            box-shadow: var(--glow-cyan);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, var(--error), #aa0033);
-            color: white;
-        }
-
-        /* Messages */
-        .messages {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            z-index: 1001;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .message {
-            padding: 1rem 1.5rem;
-            border-radius: 10px;
-            font-weight: 500;
-            animation: slideIn 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .message-success {
-            background: rgba(0, 255, 136, 0.2);
-            border: 1px solid var(--success);
-            color: var(--success);
-        }
-
-        .message-error {
-            background: rgba(255, 51, 102, 0.2);
-            border: 1px solid var(--error);
-            color: var(--error);
-        }
-
-        .message-warning {
-            background: rgba(255, 170, 0, 0.2);
-            border: 1px solid var(--warning);
-            color: var(--warning);
-        }
-
-        .message-info {
-            background: rgba(0, 255, 242, 0.2);
-            border: 1px solid var(--primary-cyan);
-            color: var(--primary-cyan);
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        /* Utility Classes */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .mb-1 { margin-bottom: 0.5rem; }
-        .mb-2 { margin-bottom: 1rem; }
-        .mb-3 { margin-bottom: 1.5rem; }
-        .mb-4 { margin-bottom: 2rem; }
-
-        .text-cyan { color: var(--primary-cyan); }
-        .text-magenta { color: var(--primary-magenta); }
-        .text-success { color: var(--success); }
-
-        /* Heading Styles */
-        h1, h2, h3, h4 {
-            font-family: 'Orbitron', monospace;
-            font-weight: 700;
-        }
-
-        .neon-text {
-            background: linear-gradient(90deg, var(--primary-cyan), var(--primary-magenta), var(--primary-cyan));
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shimmer 3s linear infinite;
-        }
-
-        @keyframes shimmer {
-            to { background-position: 200% center; }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav {
-                padding: 1rem;
-            }
-
-            .nav-logo {
-                font-size: 1.2rem;
-            }
-
-            .nav-links {
-                gap: 1rem;
-            }
-
-            .nav-links a {
-                font-size: 0.8rem;
-            }
-
-            .container {
-                padding: 0 1rem;
-            }
-
-            .glass-card {
-                padding: 1.5rem;
-            }
+            margin-top: 4rem;
         }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <div class="bg-animation"></div>
-    <div class="grid-overlay"></div>
-    <div class="scanlines"></div>
+    <div class="bg-decoration">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
 
-    <nav class="nav">
-        <div class="nav-logo">ATTENDANCE</div>
-        <ul class="nav-links">
-            <li><a href="{% url 'home' %}">Home</a></li>
-            {% if user.is_authenticated %}
-                <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-                <li><a href="{% url 'logout' %}">Logout</a></li>
-            {% else %}
-                <li><a href="{% url 'login' %}">Lecturer Login</a></li>
-            {% endif %}
-        </ul>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-fingerprint"></i> Attendance Pro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'dashboard' %}">
+                                <i class="fas fa-chart-line"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
     </nav>
 
+    <!-- Messages -->
     {% if messages %}
-    <div class="messages">
+    <div class="container mt-4">
         {% for message in messages %}
-        <div class="message message-{{ message.tags }}">
-            {{ message }}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show animate-slide-down" role="alert">
+            <i class="fas fa-bell me-2"></i> {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
         {% endfor %}
     </div>
     {% endif %}
 
-    <main class="main-content">
+    <!-- Main Content -->
+    <main>
         {% block content %}{% endblock %}
     </main>
 
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5 class="text-gradient mb-3">
+                        <i class="fas fa-fingerprint"></i> Attendance Pro
+                    </h5>
+                    <p class="text-muted">Modern attendance tracking system with QR code integration and Firebase backend.</p>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/" class="text-muted text-decoration-none"><i class="fas fa-home me-2"></i>Home</a></li>
+                        <li class="mb-2"><a href="{% url 'login' %}" class="text-muted text-decoration-none"><i class="fas fa-sign-in-alt me-2"></i>Login</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="mb-3">Contact & Support</h5>
+                    <p class="text-muted mb-2">
+                        <i class="fas fa-envelope me-2"></i> support@attendancepro.com
+                    </p>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-phone me-2"></i> +254 XXX XXX XXX
+                    </p>
+                </div>
+            </div>
+            <hr class="border-dark my-4">
+            <p class="text-center text-muted mb-0">
+                <i class="fas fa-copyright me-2"></i>2024 Digital Attendance System. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     {% block extra_js %}{% endblock %}
-    
-    <script>
-        // Auto-hide messages
-        setTimeout(() => {
-            document.querySelectorAll('.message').forEach(msg => {
-                msg.style.animation = 'slideIn 0.3s ease reverse forwards';
-                setTimeout(() => msg.remove(), 300);
-            });
-        }, 5000);
-    </script>
 </body>
 </html>
-
-
-
-

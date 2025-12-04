@@ -11,6 +11,9 @@ A modern, futuristic Django-based attendance tracking system using QR codes and 
 - **QR Code Generation**: Lecturers create sessions and generate unique QR codes
 - **Mobile-Friendly**: Students scan QR codes to access attendance forms
 - **Real-time Storage**: Attendance data saved to Firebase Firestore
+- **Dual-Sync to Portal**: Automatically sync attendance to lecturer portal API + Firebase
+- **Attendance Percentage**: Auto-calculated per student per unit (12 lessons/semester)
+- **Automatic Student Registration**: Students auto-registered on first attendance
 - **Futuristic UI**: Cyberpunk-inspired, responsive design
 - **Session Management**: Open/close sessions, view attendance records
 - **Duplicate Prevention**: Students can only mark attendance once per session

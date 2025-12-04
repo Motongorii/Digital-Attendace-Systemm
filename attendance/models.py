@@ -3,7 +3,9 @@ Models for Digital Attendance System.
 """
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 import uuid
+from decimal import Decimal
 
 
 class Lecturer(models.Model):
@@ -59,5 +61,61 @@ class AttendanceSession(models.Model):
             'end_time': str(self.end_time),
             'venue': self.venue,
         }
+
+
+class Student(models.Model):
+    """Student model - tracks student enrollment and attendance."""
+    admission_number = models.CharField(max_length=50, unique=True, db_index=True)
+    name = models.CharField(max_length=200)
+    email = models.EmailField(blank=True)
+    phone = models.CharField(max_length=20, blank=True)
+    units = models.ManyToManyField(Unit, related_name='enrolled_students')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['name']
+    
+    def __str__(self):
+        return f"{self.name} ({self.admission_number})"
+    
+    def get_attendance_percentage(self, unit=None, semester=1, max_lessons=12):
+        """
+        Calculate attendance percentage for a unit or all units.
+        Default: 12 lessons per semester.
+        """
+        if unit:
+            attendance = Attendance.objects.filter(
+                student=self, 
+                session__unit=unit
+            ).count()
+            return Decimal(attendance) / Decimal(max_lessons) * 100 if max_lessons > 0 else 0
+        else:
+            # Overall attendance across all units
+            attendance = Attendance.objects.filter(student=self).count()
+            total_sessions = AttendanceSession.objects.count()
+            return Decimal(attendance) / Decimal(total_sessions) * 100 if total_sessions > 0 else 0
+
+
+class Attendance(models.Model):
+    """Attendance record - links student to attendance session."""
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='attendance_records')
+    session = models.ForeignKey(AttendanceSession, on_delete=models.CASCADE, related_name='attendance_records')
+    timestamp = models.DateTimeField(auto_now_add=True)
+    synced_to_firebase = models.BooleanField(default=False)
+    synced_to_portal = models.BooleanField(default=False)
+    firebase_doc_id = models.CharField(max_length=200, blank=True, null=True)
+    portal_response = models.JSONField(default=dict, blank=True)
+    
+    class Meta:
+        unique_together = ('student', 'session')
+        ordering = ['-timestamp']
+    
+    def __str__(self):
+        return f"{self.student.name} - {self.session.unit.code} ({self.session.date})"
+    
+    def get_attendance_percentage(self, max_lessons=12):
+        """Get attendance percentage for the student in this session's unit."""
+        return self.student.get_attendance_percentage(unit=self.session.unit, max_lessons=max_lessons)
 
 

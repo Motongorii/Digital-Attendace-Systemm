@@ -1,10 +1,9 @@
 """
 Firebase integration service for attendance records.
 
-This version is safe for serverless deployments (Vercel):
+Features:
 - Lazy initialization of Firebase
 - Reads credentials from `FIREBASE_CREDENTIALS_JSON` (env) or `FIREBASE_CREDENTIALS_PATH`
-- Avoids import-time initialization
 """
 import os
 import json
@@ -47,7 +46,7 @@ class FirebaseService:
             self._initialized = True
             return
 
-        # Try to get credentials from env var (preferred for Vercel)
+        # Try to get credentials from env var
         cred_path = None
         cred_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
         if cred_json:
@@ -109,10 +108,12 @@ class FirebaseService:
 
     def save_attendance(self, session_id: str, student_data: dict) -> dict:
         if not self.is_connected:
+            # Firebase not available — indicate skipped remote sync so callers don't mark record as synced
             return {
-                "success": True,
-                "message": "Attendance recorded (local mode - Firebase not connected)",
-                "document_id": "local",
+                "success": False,
+                "skipped": True,
+                "message": "Firebase not connected; attendance saved locally only",
+                "document_id": None,
             }
         try:
             attendance_record = {
@@ -129,9 +130,15 @@ class FirebaseService:
                 "marked_at": firestore.SERVER_TIMESTAMP,
             }
             doc_ref = self._db.collection("attendance_records").add(attendance_record)
+            # `add` usually returns (DocumentReference, WriteResult)
+            try:
+                doc_ref_obj = doc_ref[0] if isinstance(doc_ref, (list, tuple)) else doc_ref
+                doc_id = getattr(doc_ref_obj, 'id', '')
+            except Exception:
+                doc_id = ''
             session_ref = self._db.collection("sessions").document(session_id)
             session_ref.collection("students").document(student_data.get("admission_number")).set(attendance_record)
-            return {"success": True, "document_id": doc_ref[1].id, "message": "Attendance recorded successfully"}
+            return {"success": True, "document_id": doc_id, "message": "Attendance recorded successfully"} 
         except Exception as e:
             return {"success": False, "error": str(e)}
 

@@ -12,9 +12,10 @@ from django.utils import timezone
 from django.conf import settings
 import json
 
-from .models import Lecturer, Unit, AttendanceSession
+from .models import Lecturer, Unit, AttendanceSession, Student, Attendance
 from .forms import AttendanceSessionForm, StudentAttendanceForm, UnitForm
 from .firebase_service import get_firebase_service
+from .sync_service import get_dual_sync_service
 from .qr_generator import generate_session_qr
 
 
@@ -40,37 +41,59 @@ def student_attend(request, session_id):
         form = StudentAttendanceForm(request.POST)
         if form.is_valid():
             admission_number = form.cleaned_data['admission_number']
+            student_name = form.cleaned_data['student_name']
             
-            # Check if already marked
-            if get_firebase_service().is_connected:
-                if get_firebase_service().check_already_marked(str(session.id), admission_number):
-                    messages.warning(request, 'You have already marked attendance for this session!')
-                    return render(request, 'attendance/already_marked.html', {
-                        'session': session
-                    })
+            # Check if already marked (Firebase first, then local DB fallback)
+            already_marked = False
+            fb_service = get_firebase_service()
+            if fb_service.is_connected:
+                try:
+                    already_marked = fb_service.check_already_marked(str(session.id), admission_number)
+                except Exception:
+                    already_marked = False
+            # Local DB fallback to prevent duplicates when Firebase is unavailable
+            if not already_marked:
+                already_marked = Attendance.objects.filter(session=session, student__admission_number=admission_number).exists()
+
+            if already_marked:
+                messages.warning(request, 'You have already marked attendance for this session!')
+                return render(request, 'attendance/already_marked.html', {
+                    'session': session
+                })
             
-            # Prepare attendance data
-            student_data = {
-                'student_name': form.cleaned_data['student_name'],
-                'admission_number': admission_number,
-                'unit_code': session.unit.code,
-                'unit_name': session.unit.name,
-                'lecturer_name': session.lecturer.user.get_full_name(),
-                'date': str(session.date),
-                'time_slot': f"{session.start_time} - {session.end_time}",
-                'venue': session.venue,
-            }
+            # Get or create student
+            student, created = Student.objects.get_or_create(
+                admission_number=admission_number,
+                defaults={
+                    'name': student_name,
+                }
+            )
             
-            # Save to Firebase
-            result = get_firebase_service().save_attendance(str(session.id), student_data)
+            # Update student name if provided and different
+            if student_name and student.name != student_name:
+                student.name = student_name
+                student.save()
             
-            if result.get('success'):
+            # Ensure student is enrolled in the unit
+            if session.unit not in student.units.all():
+                student.units.add(session.unit)
+            
+            # Sync to both Firebase and Portal
+            sync_result = get_dual_sync_service().sync_attendance(student, session)
+            
+            if sync_result.get('success'):
+                attendance_percentage = sync_result.get('attendance_percentage', 0)
                 return render(request, 'attendance/success.html', {
                     'session': session,
-                    'student_name': form.cleaned_data['student_name'],
+                    'student_name': student_name,
+                    'attendance_percentage': attendance_percentage,
                 })
             else:
-                messages.error(request, f"Error recording attendance: {result.get('error', 'Unknown error')}")
+                error_msg = (
+                    sync_result.get('error') or 
+                    'Failed to sync attendance. Please try again.'
+                )
+                messages.error(request, f"Error recording attendance: {error_msg}")
     else:
         form = StudentAttendanceForm()
     
@@ -118,7 +141,28 @@ def create_session(request):
             session.save()
             
             # Generate QR code
+            # Build a base URL that is reachable from other devices on the same network.
+            # If the request host is localhost/127.0.0.1 we attempt to detect the machine LAN IP
             base_url = request.build_absolute_uri('/')[:-1]
+            try:
+                host = request.get_host().split(':')[0]
+            except Exception:
+                host = ''
+
+            if host in ('127.0.0.1', 'localhost') or host == '' or settings.DEBUG:
+                try:
+                    import socket
+                    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                    # doesn't have to be reachable; used only to pick the outbound interface
+                    s.connect(('8.8.8.8', 80))
+                    local_ip = s.getsockname()[0]
+                    s.close()
+                    port = request.get_port()
+                    base_url = f"http://{local_ip}:{port}"
+                except Exception:
+                    # fallback to the original build_absolute_uri
+                    base_url = request.build_absolute_uri('/')[:-1]
+
             qr_file = generate_session_qr(session, base_url)
             session.qr_code.save(qr_file.name, qr_file)
             
@@ -138,13 +182,44 @@ def session_detail(request, session_id):
     """View session details and QR code."""
     session = get_object_or_404(AttendanceSession, id=session_id)
     
-    # Get attendance records from Firebase
-    attendance_records = get_firebase_service().get_session_attendance(str(session.id))
-    
+    # Get attendance records from Firebase (fallback to local DB if empty)
+    fb_service = get_firebase_service()
+    attendance_records = []
+    attendance_count = 0
+    if fb_service.is_connected:
+        try:
+            attendance_records = fb_service.get_session_attendance(str(session.id)) or []
+            attendance_count = len(attendance_records)
+        except Exception:
+            attendance_records = []
+            attendance_count = 0
+
+    # Supplement with local DB records (avoid duplicates)
+    local_qs = Attendance.objects.filter(session=session).select_related('student')
+    if local_qs.exists():
+        existing_adms = {r.get('admission_number') for r in attendance_records if isinstance(r, dict)}
+        for att in local_qs:
+            if att.student.admission_number in existing_adms:
+                continue
+            attendance_records.append({
+                'session_id': str(session.id),
+                'student_name': att.student.name,
+                'admission_number': att.student.admission_number,
+                'unit_code': session.unit.code,
+                'unit_name': session.unit.name,
+                'lecturer_name': session.lecturer.user.get_full_name(),
+                'date': str(session.date),
+                'time_slot': f"{session.start_time} - {session.end_time}",
+                'venue': session.venue,
+                'timestamp': att.timestamp.isoformat(),
+                'attendance_percentage': float(att.get_attendance_percentage()),
+            })
+        attendance_count = len(attendance_records)
+
     return render(request, 'attendance/session_detail.html', {
         'session': session,
         'attendance_records': attendance_records,
-        'attendance_count': len(attendance_records),
+        'attendance_count': attendance_count,
     })
 
 
