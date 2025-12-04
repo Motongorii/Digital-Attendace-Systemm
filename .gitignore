@@ -37,6 +37,14 @@ Thumbs.db
 # QR Codes (generated)
 media/qr_codes/
 
+venv/
+__pycache__/
+*.pyc
+firebase-credentials.json
+db.sqlite3
+media/
+.env
+
 
 
 
