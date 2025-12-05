@@ -137,17 +137,3 @@ else:
 
 # Optional: Firebase Realtime Database URL (only for RTDB). Leave blank for Firestore.
 FIREBASE_DATABASE_URL = os.getenv('FIREBASE_DATABASE_URL', '')
-
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    # ...
-]
-
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATIC_URL = '/static/'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-
-
-
