@@ -21,6 +21,62 @@ from .sync_service import get_dual_sync_service
 from .qr_generator import generate_session_qr
 
 
+# Temporary admin/bootstrap endpoint (token-protected)
+# Use only when you cannot run management commands on the server.
+# After creating the admin, remove this endpoint and the ADMIN_BOOTSTRAP_TOKEN env var.
+
+def bootstrap_admin(request):
+    """Create a superuser + Lecturer profile when accessed with a valid token.
+
+    Usage (after setting env var ADMIN_BOOTSTRAP_TOKEN):
+      GET /bootstrap-admin/?token=SECRET
+
+    Security: token must match env var; remove endpoint after use.
+    """
+    import os
+    from django.http import HttpResponseForbidden
+    from django.contrib.auth import get_user_model
+
+    token = request.GET.get('token')
+    expected = os.environ.get('ADMIN_BOOTSTRAP_TOKEN')
+    if not expected:
+        return HttpResponseForbidden('ADMIN_BOOTSTRAP_TOKEN not configured on server')
+    if not token or token != expected:
+        return HttpResponseForbidden('Invalid token')
+
+    User = get_user_model()
+    username = os.environ.get('ADMIN_BOOTSTRAP_USERNAME', 'admin')
+    email = os.environ.get('ADMIN_BOOTSTRAP_EMAIL', 'admin@attendance.com')
+    password = os.environ.get('ADMIN_BOOTSTRAP_PASSWORD', 'Admin@123456')
+
+    try:
+        if User.objects.filter(username=username).exists():
+            user = User.objects.get(username=username)
+            created = False
+        else:
+            user = User.objects.create_superuser(username=username, email=email, password=password)
+            created = True
+
+        # create Lecturer profile if model exists
+        try:
+            from .models import Lecturer
+            if not Lecturer.objects.filter(user=user).exists():
+                Lecturer.objects.create(
+                    user=user,
+                    staff_id=os.environ.get('ADMIN_BOOTSTRAP_STAFF_ID', 'STAFF001'),
+                    department=os.environ.get('ADMIN_BOOTSTRAP_DEPARTMENT', 'Computer Science'),
+                    phone=os.environ.get('ADMIN_BOOTSTRAP_PHONE', '+254712345678')
+                )
+        except Exception:
+            # If Lecturer model not available or fails, ignore and continue
+            pass
+
+        msg = 'Created' if created else 'Already exists'
+        return HttpResponse(f"OK: {msg} superuser '{username}'. Email: {email}")
+    except Exception as e:
+        return HttpResponse(f"ERROR: {e}", status=500)
+
+
 def home(request):
     """Landing page."""
     return render(request, 'attendance/home.html')
