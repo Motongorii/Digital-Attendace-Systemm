@@ -23,6 +23,8 @@ urlpatterns = [
     
     # API
     path('api/status/', views.api_status, name='api_status'),
+
+    # (bootstrap admin endpoint removed for security)
 ]
 
 
