@@ -14,7 +14,7 @@ class AttendanceSessionForm(forms.ModelForm):
         widgets = {
             'lecturer_name': forms.TextInput(attrs={
                 'class': 'form-input',
-                'placeholder': 'Enter lecturer name (e.g., Dr. John Doe)'
+                'placeholder': 'Enter lecturer name (e.g., Dr. Anthony Motongori)'
             }),
             'class_year': forms.Select(attrs={
                 'class': 'form-input'
