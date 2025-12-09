@@ -98,6 +98,12 @@ else:
     # In production use DB-backed sessions unless overridden by env var.
     SESSION_ENGINE = os.getenv('SESSION_ENGINE', 'django.contrib.sessions.backends.db')
 
+# Session expiry and cookie settings
+# Increase session age to 30 days (2592000 seconds) so sessions don't expire during lecturer operations
+SESSION_COOKIE_AGE = 2592000  # 30 days
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Keep session open until explicitly logged out
+SESSION_SAVE_EVERY_REQUEST = True  # Update session expiry on every request
+
 
 # Database: prefer `DATABASE_URL` (Render/Postgres), fallback to local SQLite
 import os

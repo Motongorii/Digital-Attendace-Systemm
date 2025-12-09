@@ -11,101 +11,207 @@
         align-items: center;
         justify-content: center;
         padding: 2rem;
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
     }
 
     .login-card {
         width: 100%;
-        max-width: 420px;
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 0.75rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        max-width: 450px;
+        background: rgba(20, 30, 50, 0.8);
+        border: 2px solid #00ffa3;
+        border-radius: 15px;
+        box-shadow: 0 20px 60px rgba(0, 255, 163, 0.15);
         overflow: hidden;
+        backdrop-filter: blur(10px);
     }
 
     .login-header {
-        background: linear-gradient(135deg, #dbeafe 0%, #f0f9ff 100%);
-        padding: 2rem;
+        background: linear-gradient(135deg, #00ffa3 0%, #00d9ff 100%);
+        padding: 2.5rem 2rem;
         text-align: center;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: 3px solid #00d9ff;
     }
 
     .login-icon {
-        width: 70px;
-        height: 70px;
-        background: #2563eb;
-        border-radius: 0.5rem;
+        width: 80px;
+        height: 80px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 15px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 1rem;
+        margin: 0 auto 1.5rem;
         font-size: 2.5rem;
-        color: #ffffff;
+        color: #001a33;
+        border: 2px solid rgba(0, 0, 0, 0.1);
     }
 
     .login-header h2 {
-        font-size: 1.5rem;
-        color: #1e40af;
+        font-size: 1.7rem;
+        color: #001a33;
         margin-bottom: 0.5rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
     }
 
     .login-header p {
-        color: #64748b;
+        color: rgba(0, 0, 0, 0.7);
         margin: 0;
+        font-size: 0.95rem;
+        font-weight: 500;
     }
 
     .login-body {
-        padding: 2rem;
+        padding: 2.5rem 2rem;
     }
 
     .login-body .form-group {
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.8rem;
+    }
+
+    .login-body .form-label {
+        color: #ffffff;
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.7rem;
+        display: block;
     }
 
     .login-body .form-control {
-        color: #1e293b;
-        background-color: #f1f5f9;
-        border: 1px solid #cbd5e1;
+        color: #ffffff !important;
+        background-color: rgba(255, 255, 255, 0.08);
+        border: 2px solid rgba(0, 255, 163, 0.3);
+        border-radius: 8px;
+        padding: 0.9rem 1rem;
+        font-size: 1rem;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-weight: 500;
+        transition: all 0.3s ease;
     }
 
     .login-body .form-control:focus {
-        color: #0f172a;
-        background-color: #ffffff;
-        border-color: #2563eb;
-        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+        color: #ffffff !important;
+        background-color: rgba(255, 255, 255, 0.12);
+        border-color: #00ffa3;
+        box-shadow: 0 0 20px rgba(0, 255, 163, 0.2);
+        outline: none;
     }
 
     .login-body .form-control::placeholder {
-        color: #64748b;
+        color: #888 !important;
+    }
+
+    .login-body .form-check {
+        margin: 1.5rem 0;
+    }
+
+    .login-body .form-check-label {
+        color: #00ffa3;
+        font-size: 0.95rem;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .login-body .form-check-input {
+        border: 2px solid rgba(0, 255, 163, 0.5);
+        background-color: transparent;
+        cursor: pointer;
+    }
+
+    .login-body .form-check-input:checked {
+        background-color: #00ffa3;
+        border-color: #00ffa3;
     }
 
     .login-body .btn-primary {
         width: 100%;
-        margin-top: 1rem;
+        padding: 1.1rem;
+        margin-top: 1.5rem;
+        background: linear-gradient(135deg, #00ffa3 0%, #00d9ff 100%);
+        color: #001a33;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.05rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .login-body .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(0, 255, 163, 0.4);
+    }
+
+    .login-body .btn-primary:active {
+        transform: translateY(0);
     }
 
     .login-footer {
-        border-top: 1px solid #e2e8f0;
+        border-top: 2px solid rgba(0, 255, 163, 0.2);
         padding: 1.5rem 2rem;
-        background: #f8fafc;
+        background: rgba(0, 0, 0, 0.3);
         text-align: center;
         font-size: 0.9rem;
-        color: #64748b;
+        color: #00ffa3;
+        font-weight: 500;
+    }
+
+    /* Alert/Message styling */
+    .alert {
+        border-radius: 8px;
+        border: 2px solid;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .alert-danger {
+        background-color: rgba(255, 0, 80, 0.1);
+        border-color: #ff0050;
+        color: #ff6b9d;
+    }
+
+    .alert-success {
+        background-color: rgba(0, 255, 163, 0.1);
+        border-color: #00ffa3;
+        color: #00ffa3;
+    }
+
+    .required::after {
+        content: ' *';
+        color: #ff0050;
+        font-weight: 700;
     }
 
     @media (max-width: 480px) {
         .login-card {
-            border: none;
-            border-radius: 0;
-            box-shadow: none;
-        }
-
-        .login-body {
-            padding: 1.5rem;
+            border-radius: 12px;
         }
 
         .login-header {
-            padding: 1.5rem;
+            padding: 2rem 1.5rem;
+        }
+
+        .login-header h2 {
+            font-size: 1.4rem;
+        }
+
+        .login-body {
+            padding: 2rem 1.5rem;
+        }
+
+        .login-footer {
+            padding: 1.2rem 1.5rem;
+            font-size: 0.85rem;
         }
     }
 </style>
@@ -125,10 +231,10 @@
         <div class="login-body">
             {% if messages %}
                 {% for message in messages %}
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    {{ message }}
-                </div>
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        {{ message }}
+                    </div>
                 {% endfor %}
             {% endif %}
 
@@ -166,13 +272,13 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-arrow-right me-2"></i>Sign In
+                    <i class="fas fa-arrow-right"></i>Sign In
                 </button>
             </form>
         </div>
 
         <div class="login-footer">
-            Don't have an account? Contact the system administrator
+            <i class="fas fa-lock me-2"></i> Don't have an account? Contact the system administrator
         </div>
     </div>
 </div>
