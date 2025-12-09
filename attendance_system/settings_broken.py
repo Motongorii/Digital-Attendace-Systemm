@@ -19,18 +19,6 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'dev-secret')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
-# CSRF and security settings for production (Fly.io, etc.)
-CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://localhost:8000,http://127.0.0.1:8000').split(',')
-# By default do NOT force HTTPS in the app; allow the platform/proxy to terminate TLS.
-# Set the `SECURE_SSL_REDIRECT` env var to 'True' in production only if you know
-# your environment needs Django to perform the redirect (most PaaS/proxy setups do not).
-SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'False') == 'True'
-# Don't force secure cookies unless explicitly enabled via env var.
-SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', 'False') == 'True'
-CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'False') == 'True'
-# Trust the proxy header from Fly.io (or other proxies) to detect HTTPS
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -49,7 +37,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'attendance.auth_debug.AuthDebugMiddleware',  # Must be after AuthenticationMiddleware so request.user is populated
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -86,24 +73,9 @@ CACHES = {
     }
 }
 
-# Session Configuration
-# Default to database-backed sessions in production so sessions persist
-# across processes/instances (LocMemCache is per-process and will drop
-# sessions when the process changes or is restarted — this causes users to
-# appear logged out immediately after logging in on platforms like Fly.io).
-if DEBUG:
-    # For local development we keep the faster cache-backed sessions.
-    SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-    SESSION_CACHE_ALIAS = 'default'
-else:
-    # In production use DB-backed sessions unless overridden by env var.
-    SESSION_ENGINE = os.getenv('SESSION_ENGINE', 'django.contrib.sessions.backends.db')
-
-# Session expiry and cookie settings
-# Increase session age to 30 days (2592000 seconds) so sessions don't expire during lecturer operations
-SESSION_COOKIE_AGE = 2592000  # 30 days
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Keep session open until explicitly logged out
-SESSION_SAVE_EVERY_REQUEST = True  # Update session expiry on every request
+# Session Configuration (Use Cache Backend for speed)
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
 
 
 # Database: prefer `DATABASE_URL` (Render/Postgres), fallback to local SQLite
@@ -139,9 +111,6 @@ TIME_ZONE = 'Africa/Nairobi'
 USE_I18N = True
 USE_TZ = True
 
-# Authentication
-LOGIN_URL = 'login'  # Redirect to /login/ when @login_required fails, not /accounts/login/
-
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
@@ -168,4 +137,17 @@ else:
 
 # Optional: Firebase Realtime Database URL (only for RTDB). Leave blank for Firestore.
 FIREBASE_DATABASE_URL = os.getenv('FIREBASE_DATABASE_URL', '')
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    # ...
+]
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_URL = '/static/'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+
 
