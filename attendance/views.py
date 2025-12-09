@@ -142,6 +142,11 @@ def lecturer_dashboard(request):
 @login_required
 def create_session(request):
     """Create a new attendance session."""
+    # Debug logging for diagnosing auth/session issues
+    session_key = request.session.session_key
+    is_authenticated = request.user.is_authenticated
+    print(f'[CREATE_SESSION] session_key={session_key}, auth={is_authenticated}, method={request.method}')
+    logger.info(f'[CREATE_SESSION] session_key={session_key}, auth={is_authenticated}, method={request.method}')
     try:
         lecturer = request.user.lecturer
     except Lecturer.DoesNotExist:
@@ -349,6 +354,11 @@ def toggle_session(request, session_id):
 @login_required
 def create_unit(request):
     """Create a new unit."""
+    # Debug logging for diagnosing auth/session issues
+    session_key = request.session.session_key
+    is_authenticated = request.user.is_authenticated
+    print(f'[CREATE_UNIT] session_key={session_key}, auth={is_authenticated}, method={request.method}')
+    logger.info(f'[CREATE_UNIT] session_key={session_key}, auth={is_authenticated}, method={request.method}')
     try:
         lecturer = request.user.lecturer
     except Lecturer.DoesNotExist:
