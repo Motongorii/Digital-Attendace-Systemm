@@ -14,6 +14,9 @@ import json
 import threading
 from django.core.cache import cache
 
+import logging
+logger = logging.getLogger(__name__)
+
 from .models import Lecturer, Unit, AttendanceSession, Student, Attendance
 from .forms import AttendanceSessionForm, StudentAttendanceForm, UnitForm
 from .firebase_service import get_firebase_service
@@ -377,12 +380,19 @@ def lecturer_login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
+        print(f'[LOGIN DEBUG] username={username}, auth_result={bool(user)}')
+        logger.info(f'[LOGIN DEBUG] username={username}, auth_result={bool(user)}')
         
         if user is not None:
             login(request, user)
+            session_key = request.session.session_key
+            print(f'[LOGIN SUCCESS] username={username}, session_key={session_key}')
+            logger.info(f'[LOGIN SUCCESS] username={username}, session_key={session_key}')
             messages.success(request, f'Welcome back, {user.get_full_name() or user.username}!')
             return redirect('dashboard')
         else:
+            print(f'[LOGIN FAILED] username={username}, invalid credentials')
+            logger.warning(f'[LOGIN FAILED] username={username}, invalid credentials')
             messages.error(request, 'Invalid username or password.')
     
     return render(request, 'attendance/login.html')
@@ -436,6 +446,9 @@ def api_status(request):
         'timestamp': timezone.now().isoformat(),
         'attendance_count': attendance_count,
     })
+
+
+
 
 
 

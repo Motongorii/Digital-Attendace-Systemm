@@ -3,6 +3,7 @@ URL patterns for attendance app.
 """
 from django.urls import path
 from . import views
+from .debug_views import debug_auth_check
 
 urlpatterns = [
     # Public pages
@@ -23,10 +24,9 @@ urlpatterns = [
     
     # API
     path('api/status/', views.api_status, name='api_status'),
+    
+    # Debug (temporary)
+    path('debug/auth-check/', debug_auth_check, name='debug_auth_check'),
 
     # (bootstrap admin endpoint removed for security)
 ]
-
-
-
-
