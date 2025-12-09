@@ -59,8 +59,9 @@
 
     .detail-grid {
         display: grid;
-        grid-template-columns: 1fr 350px;
-        gap: 2rem;
+        grid-template-columns: 1fr minmax(260px, 380px);
+        gap: 1.25rem;
+        align-items: start;
     }
 
     .session-info-card {
@@ -170,20 +171,26 @@
     }
 
     .qr-container img {
-        width: 250px;
-        height: 250px;
+        max-width: 100%;
+        height: auto;
         display: block;
     }
 
     .qr-placeholder {
-        width: 250px;
-        height: 250px;
+        width: 100%;
+        padding-top: 100%; /* 1:1 aspect ratio */
+        position: relative;
         background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: block;
         color: #666;
         font-size: 0.9rem;
+    }
+    .qr-placeholder::after {
+        content: attr(data-label);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
 
     .qr-url {
@@ -198,7 +205,7 @@
     }
 
     .attendance-section {
-        margin-top: 2rem;
+        margin-top: 1rem;
     }
 
     .section-header {
@@ -232,16 +239,24 @@
         font-family: 'Orbitron', monospace;
     }
 
+    .attendance-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
     .attendance-table {
         width: 100%;
         border-collapse: collapse;
+        min-width: 480px; /* allow horizontal scroll on very small screens */
     }
 
     .attendance-table th,
     .attendance-table td {
-        padding: 1rem;
+        padding: 0.75rem 0.5rem;
         text-align: left;
         border-bottom: 1px solid var(--glass-border);
+        vertical-align: middle;
+        word-break: break-word;
     }
 
     .attendance-table th {
@@ -289,6 +304,7 @@
             order: -1;
             position: relative;
             top: auto;
+            margin-bottom: 1rem;
         }
     }
 
@@ -309,6 +325,16 @@
         .btn {
             width: 100%;
         }
+
+        .unit-code { font-size: 1.4rem; }
+        .unit-name { font-size: 1rem; }
+        .qr-container { max-width: 320px; margin: 0 auto; }
+    }
+
+    @media (max-width: 420px) {
+        .info-item { padding: 0.9rem; }
+        .attendance-table th, .attendance-table td { padding: 0.5rem; font-size: 0.9rem; }
+        .qr-container img { max-width: 260px; }
     }
 </style>
 {% endblock %}
