@@ -85,9 +85,18 @@ CACHES = {
     }
 }
 
-# Session Configuration (Use Cache Backend for speed)
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-SESSION_CACHE_ALIAS = 'default'
+# Session Configuration
+# Default to database-backed sessions in production so sessions persist
+# across processes/instances (LocMemCache is per-process and will drop
+# sessions when the process changes or is restarted — this causes users to
+# appear logged out immediately after logging in on platforms like Fly.io).
+if DEBUG:
+    # For local development we keep the faster cache-backed sessions.
+    SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+    SESSION_CACHE_ALIAS = 'default'
+else:
+    # In production use DB-backed sessions unless overridden by env var.
+    SESSION_ENGINE = os.getenv('SESSION_ENGINE', 'django.contrib.sessions.backends.db')
 
 
 # Database: prefer `DATABASE_URL` (Render/Postgres), fallback to local SQLite
