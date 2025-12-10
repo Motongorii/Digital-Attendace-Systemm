@@ -48,32 +48,240 @@
         content: '';
         position: absolute;
         top: 0;
+        <style>
+          .modal-backdrop {
+            display: none !important;
+            position: fixed !important;
+            inset: 0 !important;
+            background: rgba(0, 0, 0, 0.75) !important;
+            backdrop-filter: blur(3px);
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 1050 !important;
+            padding: 1rem !important;
+            overflow-y: auto !important;
+          }
+
+          .modal-backdrop[style*="display:flex"] {
+            display: flex !important;
+          }
+
+          .modal-content {
+            max-width: 600px !important;
+            width: 100% !important;
+            padding: 2.5rem !important;
+            margin: auto !important;
+            border: 3px solid #00ffe6 !important;
+            box-shadow: 0 0 40px rgba(0, 255, 242, 0.35), inset 0 0 30px rgba(0, 255, 242, 0.1) !important;
+            border-radius: 25px !important;
+            background: rgba(15, 23, 42, 0.95) !important;
+            animation: modalSlideIn 0.3s ease-out;
+          }
+
+          @keyframes modalSlideIn {
+            from {
+              opacity: 0;
+              transform: scale(0.95) translateY(-30px);
+            }
+            to {
+              opacity: 1;
+              transform: scale(1) translateY(0);
+            }
+          }
+
+          .modal-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 2rem !important;
+            padding-bottom: 1.5rem !important;
+            border-bottom: 2px solid rgba(0, 255, 242, 0.3) !important;
+          }
+
+          .modal-title {
+            color: #00ffe6 !important;
+            font-size: 2.2rem !important;
+            margin: 0 !important;
+            font-family: 'Orbitron', monospace !important;
+            font-weight: 900 !important;
+            text-shadow: 0 0 12px #00ffe6, 0 0 4px #fff !important;
+            letter-spacing: 1px !important;
+          }
+
+          .modal-close-btn {
+            background: rgba(255, 51, 102, 0.2) !important;
+            border: 2px solid #ff3366 !important;
+            color: #ff3366 !important;
+            font-size: 1.8rem !important;
+            cursor: pointer !important;
+            padding: 0.5rem !important;
+            width: 50px !important;
+            height: 50px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.3s !important;
+            border-radius: 8px !important;
+          }
+
+          .modal-close-btn:hover {
+            background: rgba(255, 51, 102, 0.4) !important;
+            transform: scale(1.1) !important;
+          }
+
+          .modal-form-group {
+            margin-bottom: 1.75rem !important;
+          }
+
+          .modal-label {
+            color: #00ffe6 !important;
+            font-weight: 800 !important;
+            font-size: 1.15rem !important;
+            display: block !important;
+            margin-bottom: 0.75rem !important;
+            letter-spacing: 0.5px !important;
+            text-shadow: 0 0 4px #00ffe6 !important;
+          }
+
+          .modal-input,
+          .modal-select,
+          .modal-textarea {
+            width: 100% !important;
+            padding: 1rem !important;
+            font-size: 1.1rem !important;
+            background: rgba(0, 0, 0, 0.5) !important;
+            border: 2px solid #00ffe6 !important;
+            color: #fff !important;
+            border-radius: 12px !important;
+            transition: all 0.3s !important;
+            font-family: inherit !important;
+            box-sizing: border-box !important;
+          }
+
+          .modal-input:focus,
+          .modal-select:focus,
+          .modal-textarea:focus {
+            outline: none !important;
+            border-color: #00ffff !important;
+            box-shadow: 0 0 20px rgba(0, 255, 242, 0.5), inset 0 0 10px rgba(0, 255, 242, 0.1) !important;
+            background: rgba(0, 0, 0, 0.3) !important;
+          }
+
+          .modal-textarea {
+            min-height: 120px !important;
+            resize: vertical !important;
+          }
+
+          .modal-errors {
+            margin-bottom: 1.5rem !important;
+            padding: 1rem !important;
+            color: #ff3366 !important;
+            font-weight: 800 !important;
+            font-size: 1.05rem !important;
+            background: rgba(255, 51, 102, 0.1) !important;
+            border-left: 4px solid #ff3366 !important;
+            border-radius: 8px !important;
+            display: none !important;
+          }
+
+          .modal-actions {
+            display: flex !important;
+            gap: 1rem !important;
+            margin-top: 2rem !important;
+          }
+
+          .modal-btn {
+            flex: 1 !important;
+            padding: 1.2rem !important;
+            font-size: 1.15rem !important;
+            font-weight: 800 !important;
+            border: none !important;
+            border-radius: 12px !important;
+            cursor: pointer !important;
+            transition: all 0.3s !important;
+            letter-spacing: 0.5px !important;
+            text-transform: uppercase !important;
+          }
+
+          .modal-btn-submit {
+            background: linear-gradient(135deg, #00ffe6, #00ffff) !important;
+            color: #000 !important;
+            box-shadow: 0 0 20px rgba(0, 255, 242, 0.4) !important;
+          }
+
+          .modal-btn-submit:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 0 30px rgba(0, 255, 242, 0.6) !important;
+          }
+
+          .modal-btn-cancel {
+            background: rgba(255, 51, 102, 0.2) !important;
+            color: #ff3366 !important;
+            border: 2px solid #ff3366 !important;
+          }
+
+          .modal-btn-cancel:hover {
+            background: rgba(255, 51, 102, 0.3) !important;
+            transform: translateY(-3px) !important;
+          }
+
+          @media (max-width: 768px) {
+            .modal-content {
+              padding: 1.75rem !important;
+              border-radius: 16px !important;
+            }
+
+            .modal-title {
+              font-size: 1.75rem !important;
+            }
+
+            .modal-label {
+              font-size: 1rem !important;
+            }
+
+            .modal-input,
+            .modal-select,
+            .modal-textarea {
+              font-size: 1rem !important;
+              padding: 0.9rem !important;
+            }
+
+            .modal-btn {
+              padding: 1rem !important;
+              font-size: 1rem !important;
+            }
+
+            .modal-actions {
+              flex-direction: column !important;
+            }
+          }
+        </style>
         right: 0;
         width: 80px;
-        height: 80px;
-        background: radial-gradient(circle, rgba(0, 255, 242, 0.1) 0%, transparent 70%);
-    }
-
-    .stat-value {
-        font-family: 'Orbitron', monospace;
+        <div id="newUnitModal" class="modal-backdrop">
+          <div class="modal-content glass-card">
+            <div class="modal-header">
+              <h2 class="modal-title">+ Add New Unit</h2>
+              <button type="button" id="unit-modal-close" class="modal-close-btn">Ã—</button>
+            </div>
         font-size: 2.5rem;
         font-weight: 700;
-        color: var(--primary-cyan);
-        margin-bottom: 0.5rem;
-    }
+              <div class="modal-form-group">
+                <label for="unit_code" class="modal-label">Unit Code</label>
+                <input name="code" id="unit_code" class="modal-input" placeholder="e.g., CS101" required />
 
-    .stat-label {
-        color: var(--text-secondary);
-        text-transform: uppercase;
+              <div class="modal-form-group">
+                <label for="unit_name" class="modal-label">Unit Name</label>
+                <input name="name" id="unit_name" class="modal-input" placeholder="e.g., Introduction to Programming" required />
         letter-spacing: 1px;
-        font-size: 0.85rem;
-    }
-
+              <div class="modal-form-group">
+                <label for="unit_description" class="modal-label">Description (Optional)</label>
+                <textarea name="description" id="unit_description" class="modal-textarea" placeholder="Add any notes or details about this unit..."></textarea>
     .section-title {
-        font-size: 1.5rem;
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
+              <div id="new-unit-errors" class="modal-errors"></div>
+              <div class="modal-actions">
+                <button type="submit" class="modal-btn modal-btn-submit">Create Unit</button>
+                <button type="button" id="new-unit-cancel" class="modal-btn modal-btn-cancel">Cancel</button>
         gap: 0.75rem;
     }
 
@@ -82,41 +290,51 @@
         width: 4px;
         height: 24px;
         background: linear-gradient(180deg, var(--primary-cyan), var(--primary-purple));
-        border-radius: 2px;
-    }
-
-    .sessions-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        gap: 1.5rem;
-    }
-
-    .session-card {
-        padding: 1.5rem;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
+        <div id="newSessionModal" class="modal-backdrop">
+          <div class="modal-content glass-card">
+            <div class="modal-header">
+              <h2 class="modal-title">ðŸ“… Create Session</h2>
+              <button type="button" id="session-modal-close" class="modal-close-btn">Ã—</button>
+            </div>
+            <form id="new-session-form">
+              {% csrf_token %}
+              <div class="modal-form-group">
+                <label for="session_unit" class="modal-label">Unit</label>
+                <select name="unit" id="session_unit" class="modal-select" required>
+                  <option value="">-- Select a Unit --</option>
+                  {% for unit in units %}<option value="{{ unit.id }}">{{ unit.code }} - {{ unit.name }}</option>{% endfor %}
+                </select>
+              </div>
+              <div class="modal-form-group">
+                <label for="session_semester" class="modal-label">Semester</label>
+                <select name="semester" id="session_semester" class="modal-select" required>
+                  <option value="">-- Select Semester --</option>
+                  <option value="1">Semester 1</option>
+                  <option value="2">Semester 2</option>
+                </select>
     .session-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 40px rgba(0, 255, 242, 0.1);
-    }
+              <div class="modal-form-group">
+                <label for="session_date" class="modal-label">Date</label>
+                <input type="date" name="date" id="session_date" class="modal-input" required />
 
-    .session-header {
-        display: flex;
-        justify-content: space-between;
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div class="modal-form-group" style="margin-bottom:0;">
+                  <label for="session_start_time" class="modal-label">Start Time</label>
+                  <input type="time" name="start_time" id="session_start_time" class="modal-input" required />
+                </div>
+                <div class="modal-form-group" style="margin-bottom:0;">
+                  <label for="session_end_time" class="modal-label">End Time</label>
+                  <input type="time" name="end_time" id="session_end_time" class="modal-input" required />
+                </div>
         align-items: flex-start;
-        margin-bottom: 1rem;
-    }
-
+              <div class="modal-form-group">
+                <label for="session_venue" class="modal-label">Venue (Room/Location)</label>
+                <input name="venue" id="session_venue" class="modal-input" placeholder="e.g., Room 101" required />
     .session-unit {
-        font-family: 'Orbitron', monospace;
-        font-size: 1.2rem;
-        color: var(--primary-cyan);
-    }
-
-    .session-status {
-        padding: 0.25rem 0.75rem;
-        border-radius: 50px;
+              <div id="new-session-errors" class="modal-errors"></div>
+              <div class="modal-actions">
+                <button type="submit" class="modal-btn modal-btn-submit">Create Session</button>
+                <button type="button" id="new-session-cancel" class="modal-btn modal-btn-cancel">Cancel</button>
         font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 1px;
@@ -394,7 +612,7 @@
   <div class="modal-content glass-card" style="max-width:550px; width:100%; padding:2rem; border:2px solid var(--primary-cyan); box-shadow:0 0 30px rgba(0,255,242,0.25), inset 0 0 20px rgba(0,255,242,0.1); border-radius:20px; margin:auto;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
       <h2 style="color:#00ffe6; font-size:1.8rem; margin:0; font-family:'Orbitron',monospace; font-weight:800; text-shadow:0 0 8px #00ffe6;">Add New Unit</h2>
-      <button type="button" id="unit-modal-close" style="background:none; border:none; color:#00ffe6; font-size:2rem; cursor:pointer; padding:0; width:40px; height:40px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;">×</button>
+      <button type="button" id="unit-modal-close" style="background:none; border:none; color:#00ffe6; font-size:2rem; cursor:pointer; padding:0; width:40px; height:40px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;">ï¿½</button>
     </div>
     <form id="new-unit-form">
       {% csrf_token %}
@@ -520,7 +738,7 @@
   <div class="modal-content glass-card" style="max-width:600px; width:100%; padding:2rem; border:2px solid var(--primary-magenta); box-shadow:0 0 30px rgba(255,0,128,0.2), inset 0 0 20px rgba(255,0,128,0.08); border-radius:20px; margin:auto;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
       <h2 style="color:#ff0080; font-size:1.8rem; margin:0; font-family:'Orbitron',monospace; font-weight:800; text-shadow:0 0 8px #ff0080;">Create Session</h2>
-      <button type="button" id="session-modal-close" style="background:none; border:none; color:#ff0080; font-size:2rem; cursor:pointer; padding:0; width:40px; height:40px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;">×</button>
+      <button type="button" id="session-modal-close" style="background:none; border:none; color:#ff0080; font-size:2rem; cursor:pointer; padding:0; width:40px; height:40px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;">ï¿½</button>
     </div>
     <form id="new-session-form">
       {% csrf_token %}
