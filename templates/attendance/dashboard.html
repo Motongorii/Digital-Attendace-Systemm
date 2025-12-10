@@ -483,20 +483,13 @@
         const json = await resp.json();
 
         if(json.success) {
-          // Add unit to list
-          const unitsList = document.querySelector('.units-list');
-          if(unitsList) {
-            const tag = document.createElement('span');
-            tag.className = 'unit-tag';
-            tag.textContent = json.unit.code + ' - ' + json.unit.name;
-            unitsList.prepend(tag);
-          }
           // Close modal and reset form
           modal.style.display = 'none';
           form.reset();
-          if(window.showNotification) {
-            showNotification('Unit created successfully!', 'success');
-          }
+          // Reload page to refresh unit count and display new unit
+          setTimeout(() => {
+            location.reload();
+          }, 500);
         } else {
           let html = '';
           if(json.error === 'not_a_lecturer') {
