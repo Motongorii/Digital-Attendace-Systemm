@@ -463,3 +463,21 @@ def api_status(request):
 
 
 
+
+@login_required
+@require_http_methods(["POST"])
+def create_unit_ajax(request):
+    """AJAX endpoint to create a Unit and return JSON. Used by dashboard modal."""
+    try:
+        lecturer = request.user.lecturer
+    except Lecturer.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'not_a_lecturer'}, status=403)
+
+    form = UnitForm(request.POST)
+    if form.is_valid():
+        unit = form.save(commit=False)
+        unit.lecturer = lecturer
+        unit.save()
+        return JsonResponse({'success': True, 'unit': {'id': unit.id, 'code': unit.code, 'name': unit.name}}, status=201)
+    else:
+        return JsonResponse({'success': False, 'errors': form.errors}, status=400)

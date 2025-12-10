@@ -20,6 +20,7 @@ urlpatterns = [
     path('session/<uuid:session_id>/', views.session_detail, name='session_detail'),
     path('session/<uuid:session_id>/toggle/', views.toggle_session, name='toggle_session'),
     path('session/<uuid:session_id>/download-qr/', views.download_qr, name='download_qr'),
+    path('unit/create-ajax/', views.create_unit_ajax, name='create_unit_ajax'),
     path('unit/create/', views.create_unit, name='create_unit'),
     
     # API
