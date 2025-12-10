@@ -389,7 +389,7 @@
 
 
 <!-- New Unit Modal -->
-<div id="newUnitModal" class="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:1000;">
+<!-- New Unit Modal: Inline form to add units without page reload --><div id="newUnitModal" class="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:1000;">
   <div class="glass-card" style="max-width:520px; width:90%; padding:1.25rem;">
     <h3 style="margin-top:0;">Add New Unit</h3>
     <form id="new-unit-form">
@@ -403,8 +403,8 @@
         <input name="name" id="unit_name" class="form-input" required />
       </div>
       <div class="form-group">
-        <label for="unit_description">Description</label>
-        <textarea name="description" id="unit_description" class="form-input" rows="3"></textarea>
+        <label for="unit_description" style="color:#00ffe6; font-weight:700;">Description (Optional - Clear Notes)</label>
+        <textarea name="description" id="unit_description" class="form-input" style="color:#ffffff; background:rgba(0,255,242,0.08); border:2px solid var(--primary-cyan);" rows="3"></textarea>
       </div>
       <div style="display:flex; gap:0.5rem; margin-top:1rem;">
         <button type="submit" class="btn btn-primary">Create</button>
@@ -426,48 +426,101 @@
   const cancel = document.getElementById('new-unit-cancel');
   const form = document.getElementById('new-unit-form');
   const errorsEl = document.getElementById('new-unit-errors');
+  const codeInput = document.getElementById('unit_code');
+  const nameInput = document.getElementById('unit_name');
+  const descInput = document.getElementById('unit_description');
 
-  openBtn && openBtn.addEventListener('click', ()=>{
-    modal.style.display = 'flex';
-  });
-  cancel && cancel.addEventListener('click', ()=>{ modal.style.display='none'; errorsEl.innerHTML=''; form.reset(); });
+  // Open modal on button click
+  if(openBtn) {
+    openBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      modal.style.display = 'flex';
+      // Focus first field
+      setTimeout(() => codeInput && codeInput.focus(), 100);
+    });
+  }
 
-  form && form.addEventListener('submit', (e)=>{
-    e.preventDefault();
-    errorsEl.innerHTML='';
-    const data = new FormData(form);
-    fetch('{% url "create_unit_ajax" %}', {
-      method: 'POST',
-      body: data,
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRFToken': getCookie('csrftoken')
+  // Close modal
+  if(cancel) {
+    cancel.addEventListener('click', () => {
+      modal.style.display = 'none';
+      errorsEl.innerHTML = '';
+      form.reset();
+    });
+  }
+
+  // Close modal on outside click
+  if(modal) {
+    modal.addEventListener('click', (e) => {
+      if(e.target === modal) {
+        modal.style.display = 'none';
+        errorsEl.innerHTML = '';
       }
-    }).then(r=>r.json().then(j=>({ok:r.ok, status:r.status, json:j}))).then(res=>{
-      if(res.ok && res.json.success){
-        // add to units list
-        const list = document.querySelector('.units-list');
-        if(list){
-          const span = document.createElement('span');
-          span.className='unit-tag';
-          span.textContent = res.json.unit.code + ' - ' + res.json.unit.name;
-          list.prepend(span);
-        }
-        modal.style.display='none';
-        form.reset();
-      } else {
-        if(res.json && res.json.errors){
-          let html='';
-          for(const k in res.json.errors){ html += `<div><strong>${k}:</strong> ${res.json.errors[k].join(', ')}</div>` }
-          errorsEl.innerHTML = html;
-        } else if(res.json && res.json.error){
-          errorsEl.textContent = res.json.error;
+    });
+  }
+
+  // Form submission
+  if(form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorsEl.innerHTML = '';
+
+      const formData = new FormData(form);
+      const csrfToken = getCookie('csrftoken');
+
+      try {
+        const resp = await fetch('/unit/create-ajax/', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          credentials: 'same-origin'
+        });
+
+        const json = await resp.json();
+
+        if(json.success) {
+          // Add unit to list
+          const unitsList = document.querySelector('.units-list');
+          if(unitsList) {
+            const tag = document.createElement('span');
+            tag.className = 'unit-tag';
+            tag.textContent = json.unit.code + ' - ' + json.unit.name;
+            unitsList.prepend(tag);
+          }
+          // Close modal and reset form
+          modal.style.display = 'none';
+          form.reset();
+          // Show success via toast or alert
+          if(window.showNotification) {
+            showNotification('Unit created successfully!', 'success');
+          }
         } else {
-          errorsEl.textContent = 'An error occurred';
+          if(json.errors) {
+            let html = '';
+            for(const key in json.errors) {
+              const msgs = json.errors[key];
+              if(Array.isArray(msgs)) {
+                html += '<div><strong>' + key + ':</strong> ' + msgs.join(', ') + '</div>';
+              } else {
+                html += '<div><strong>' + key + ':</strong> ' + msgs + '</div>';
+              }
+            }
+            errorsEl.innerHTML = html;
+          } else if(json.error) {
+            errorsEl.textContent = 'Error: ' + json.error;
+          } else {
+            errorsEl.textContent = 'An error occurred. Please try again.';
+          }
         }
+      } catch(err) {
+        console.error('Network error:', err);
+        errorsEl.textContent = 'Network error. Please check your connection.';
       }
-    }).catch(err=>{ errorsEl.textContent='Network error'; });
-  });
+    });
+  }
 })();
 </script>
 
@@ -561,6 +614,9 @@
 })();
 </script>
 {% endblock %}
+
+
+
 
 
 
