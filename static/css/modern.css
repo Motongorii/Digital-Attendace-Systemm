@@ -103,6 +103,25 @@ body {
     }
 }
 
+/* Responsive adjustments to reduce clutter on small screens */
+@media (max-width: 900px) {
+    .bg-decoration { display: none !important; }
+    main { padding: 1.25rem 0 !important; }
+    .container.dashboard-container { padding-left: 0.75rem; padding-right: 0.75rem; }
+    .sessions-grid { gap: 1rem; }
+    .stat-value { font-size: 2rem; }
+}
+
+@media (max-width: 480px) {
+    .blob-1, .blob-2, .blob-3 { display: none !important; }
+    .navbar { padding: 0.75rem 1rem !important; }
+    .navbar-brand { font-size: 1.25rem !important; }
+    main { padding: 0.75rem 0 !important; }
+    .login-wrapper { padding: 1rem !important; min-height: calc(100vh - 120px) !important; }
+    .login-card { max-width: 100% !important; margin: 0 0.5rem !important; }
+    .modal-content { margin: 0 0.5rem !important; }
+}
+
 /* ========================================
    CARDS & CONTAINERS
    ======================================== */
