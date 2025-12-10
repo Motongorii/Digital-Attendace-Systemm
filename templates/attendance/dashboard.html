@@ -374,16 +374,17 @@
     </div>
     {% endif %}
 
-    <!-- Key Features Section -->
-    <div class="glass-card" style="margin-bottom:2rem; background:rgba(0,255,242,0.12); border-left:6px solid var(--primary-cyan);">
-        <h2 style="color:#00ffe6; font-size:1.35rem; margin-bottom:0.5rem; font-family:'Orbitron',monospace; letter-spacing:1px;">Key Features</h2>
-        <ul style="color:#fff; font-size:1.08rem; line-height:1.7; margin-left:1.2rem;">
-            <li>Add units and sessions instantly from any device</li>
-            <li>Generate QR codes for attendance marking</li>
-            <li>View all students who have scanned and marked attendance</li>
-            <li>Mobile-first, responsive design—no overlap, easy to use</li>
-            <li>Real-time updates and secure authentication</li>
-        </ul>
+    <!-- Key Features: visible, high-contrast block -->
+    <div class="glass-card" style="margin-bottom:2rem; background:linear-gradient(90deg, rgba(0,255,242,0.08), rgba(0,0,0,0.12)); border-left:8px solid #00ffe6; box-shadow:0 8px 30px rgba(0,255,230,0.08); padding:1rem 1.25rem;">
+      <h2 style="color:#00ffe6; font-size:1.9rem; margin-bottom:0.25rem; font-family:'Orbitron',monospace; letter-spacing:1.5px; text-shadow:0 0 6px #00ffe6; font-weight:800;">Key Features</h2>
+      <p style="color:#e6ffff; margin-top:0; margin-bottom:0.5rem; font-size:1rem; opacity:0.95;">Core capabilities of your attendance portal.</p>
+      <ul style="color:#fff; font-size:1.05rem; line-height:1.9; margin-left:1.2rem; font-weight:600;">
+        <li>Add units and sessions instantly from any device</li>
+        <li>Generate QR codes for attendance marking</li>
+        <li>View all students who have scanned and marked attendance</li>
+        <li>Mobile-first, responsive design — no overlap, easy to use</li>
+        <li>Real-time updates and secure authentication</li>
+      </ul>
     </div>
 </div>
 
@@ -410,7 +411,7 @@
         <button type="submit" class="btn btn-primary">Create</button>
         <button type="button" id="new-unit-cancel" class="btn btn-secondary">Cancel</button>
       </div>
-      <div id="new-unit-errors" style="margin-top:0.75rem;color:var(--error);"></div>
+      <div id="new-unit-errors" style="margin-top:0.75rem;color:var(--error);font-weight:700;font-size:1.1rem;"></div>
     </form>
   </div>
 </div>
@@ -493,13 +494,14 @@
           // Close modal and reset form
           modal.style.display = 'none';
           form.reset();
-          // Show success via toast or alert
           if(window.showNotification) {
             showNotification('Unit created successfully!', 'success');
           }
         } else {
-          if(json.errors) {
-            let html = '';
+          let html = '';
+          if(json.error === 'not_a_lecturer') {
+            html = '<div style="color:#ff0055;font-weight:900;font-size:1.15rem;">You are not registered as a lecturer. Please contact admin.</div>';
+          } else if(json.errors) {
             for(const key in json.errors) {
               const msgs = json.errors[key];
               if(Array.isArray(msgs)) {
@@ -508,12 +510,12 @@
                 html += '<div><strong>' + key + ':</strong> ' + msgs + '</div>';
               }
             }
-            errorsEl.innerHTML = html;
           } else if(json.error) {
-            errorsEl.textContent = 'Error: ' + json.error;
+            html = '<div>Error: ' + json.error + '</div>';
           } else {
-            errorsEl.textContent = 'An error occurred. Please try again.';
+            html = '<div>An error occurred. Please try again.</div>';
           }
+          errorsEl.innerHTML = html;
         }
       } catch(err) {
         console.error('Network error:', err);
