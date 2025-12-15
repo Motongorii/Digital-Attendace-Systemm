@@ -421,8 +421,15 @@ def download_qr(request, session_id):
     session = get_object_or_404(AttendanceSession, id=session_id)
     
     if session.qr_code:
-        response = HttpResponse(session.qr_code.read(), content_type='image/png')
-        response['Content-Disposition'] = f'attachment; filename="qr_{session.unit.code}_{session.date}.png"'
+        img_bytes = session.qr_code.read()
+        response = HttpResponse(img_bytes, content_type='image/png')
+        # By default serve the image inline so it can be embedded in <img> tags even
+        # when MEDIA files are not served by the platform. Add `?download=1` to force
+        # an attachment download when needed.
+        if request.GET.get('download'):
+            response['Content-Disposition'] = f'attachment; filename="qr_{session.unit.code}_{session.date}.png"'
+        else:
+            response['Content-Disposition'] = 'inline'
         return response
     
     messages.error(request, 'QR code not found.')

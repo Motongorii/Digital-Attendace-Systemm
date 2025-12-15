@@ -479,7 +479,9 @@
             <div class="qr-title">📱 QR Code</div>
             <div class="qr-container">
                 {% if session.qr_code %}
-                <img src="{{ session.qr_code.url }}" alt="QR Code for {{ session.unit.code }}">
+                {# Use the download view as the image source so the QR image is served
+                   by Django even when MEDIA static serving is disabled in production. #}
+                <img src="{% url 'download_qr' session.id %}" alt="QR Code for {{ session.unit.code }}">
                 {% else %}
                 <div class="qr-placeholder">QR Code not generated</div>
                 {% endif %}
@@ -490,7 +492,7 @@
             <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
                 ✓ Students scan this QR code to mark attendance instantly
             </p>
-            <a href="{% url 'download_qr' session.id %}" class="btn btn-primary" style="width: 100%;">
+            <a href="{% url 'download_qr' session.id %}?download=1" class="btn btn-primary" style="width: 100%;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                     <polyline points="7 10 12 15 17 10"/>
