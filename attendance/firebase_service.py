@@ -169,3 +169,9 @@ def get_firebase_service() -> FirebaseService:
     if _firebase_service_singleton is None:
         _firebase_service_singleton = FirebaseService()
     return _firebase_service_singleton
+
+
+# Backwards-compatible module-level instance
+# Older code/tests import `firebase_service` from this module, so expose
+# a singleton instance named `firebase_service` to avoid import errors.
+firebase_service = get_firebase_service()
