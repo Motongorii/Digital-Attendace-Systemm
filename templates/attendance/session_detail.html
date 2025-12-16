@@ -473,6 +473,23 @@
                 </div>
                 {% endif %}
             </div>
+
+            <div class="glass-card students-card" style="margin-top: 1rem;">
+                <div class="section-header">
+                    <div class="section-title">👥 Enrolled Students</div>
+                    <span class="count-badge"><span id="enrolled-count">{{ enrolled_students|length }}</span> students</span>
+                </div>
+                <div style="overflow-x:auto;">
+                    <ul id="enrolled-list" style="list-style:none; padding-left:0; margin:0;">
+                        {% for student in enrolled_students %}
+                        <li data-adm="{{ student.admission_number }}" style="padding: .4rem 0; border-bottom: 1px dashed var(--muted); display:flex; justify-content:space-between; align-items:center;">
+                            <div><strong>{{ student.name }}</strong> <small style="color:var(--text-secondary);">({{ student.admission_number }})</small></div>
+                            <div class="present-badge">{% if student.admission_number in attending_admissions %}<span class="badge badge-success">Present</span>{% else %}<span class="badge badge-light">—</span>{% endif %}</div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
         </div>
 
         <div class="glass-card qr-card">
@@ -516,14 +533,68 @@ function refreshAttendance() {
             if (data.attendance_count !== undefined) {
                 document.getElementById('attendance-count').textContent = data.attendance_count;
             }
-            // Visual feedback that we're updating
+            // Update the attendance list table body
+            if (Array.isArray(data.attendance_records)) {
+                const tbody = document.getElementById('attendance-body');
+                if (tbody) {
+                    tbody.innerHTML = '';
+                    if (data.attendance_records.length === 0) {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `<td colspan="4" style="text-align:center;color:var(--text-secondary);">No attendance records yet</td>`;
+                        tbody.appendChild(tr);
+                    } else {
+                        data.attendance_records.forEach(rec => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td><code>${rec.admission_number || ''}</code></td>
+                                <td><strong>${rec.student_name || ''}</strong></td>
+                                <td><small>${rec.timestamp ? rec.timestamp.slice(-8) : ''}</small></td>
+                                <td><strong>${(rec.attendance_percentage || 0).toFixed(1)}%</strong></td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    }
+                }
+            }
+
+            // Update enrolled student presence badges
+            try {
+                if (Array.isArray(data.attendance_records)) {
+                    const present = new Set(data.attendance_records.map(r => r.admission_number));
+                    const enrolledList = document.getElementById('enrolled-list');
+                    if (enrolledList) {
+                        Array.from(enrolledList.querySelectorAll('li')).forEach(li => {
+                            const adm = li.getAttribute('data-adm');
+                            const badge = li.querySelector('.present-badge');
+                            if (!badge) return;
+                            if (present.has(adm)) {
+                                badge.innerHTML = '<span class="badge badge-success">Present</span>';
+                            } else {
+                                badge.innerHTML = '<span class="badge badge-light">—</span>';
+                            }
+                        });
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to update enrolled presence', e);
+            }
+
+            // Visual feedback that we're updating (timestamped)
             const indicator = document.getElementById('refresh-status');
             if (indicator) {
                 indicator.classList.add('updating');
-                setTimeout(() => indicator.classList.remove('updating'), 200);
+                indicator.textContent = '♻️ Updated ' + new Date().toLocaleTimeString();
+                setTimeout(() => indicator.classList.remove('updating'), 500);
             }
         })
-        .catch(error => console.log('Auto-refresh paused'));
+        .catch(err => {
+            const indicator = document.getElementById('refresh-status');
+            if (indicator) {
+                indicator.classList.remove('updating');
+                indicator.textContent = '⚠️ Network error — could not fetch attendance. Please check the server.';
+            }
+            console.error('Attendance refresh failed', err);
+        });
 }
 
 // Start auto-refresh
