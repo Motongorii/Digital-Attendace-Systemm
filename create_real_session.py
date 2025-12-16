@@ -64,7 +64,8 @@ print(f'{"✓ Created" if session_created else "✓ Exists"} Session: {session.i
 
 # Generate QR if not already generated
 if not session.qr_code or session.qr_code.size == 0:
-    base_url = 'https://digital-attendance-system.fly.dev'
+    # Use environment variable SITE_BASE_URL if set, otherwise default to localhost
+    base_url = os.environ.get('SITE_BASE_URL', 'http://127.0.0.1:8000')
     qr_file = generate_session_qr(session, base_url)
     session.qr_code.save(qr_file.name, qr_file)
     session.save()
@@ -73,6 +74,6 @@ else:
     print(f'✓ QR already exists: {session.qr_code.name}')
 
 print(f'\n✓ Session ready:')
-print(f'  URL: https://digital-attendance-system.fly.dev/attend/{session.id}/')
+print(f'  URL: {base_url}/attend/{session.id}/')
 print(f'  QR file: {session.qr_code.name}')
-print(f'  Dashboard: https://digital-attendance-system.fly.dev/dashboard/')
+print(f'  Dashboard: {base_url}/dashboard/')

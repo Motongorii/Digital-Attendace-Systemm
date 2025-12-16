@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Debug script to check and fix Motog user and Lecturer profile on Fly."""
+"""Debug script to check and fix Motog user and Lecturer profile."""
 import os
 import django
 

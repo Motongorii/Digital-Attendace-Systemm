@@ -1,6 +1,6 @@
 import requests
 
-BASE = 'https://digital-attendance-system.fly.dev'
+BASE = 'http://127.0.0.1:8000'  # Use local dev server by default
 USERNAME = 'Motog'
 PASSWORD = '123456'
 

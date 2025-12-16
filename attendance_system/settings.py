@@ -19,7 +19,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'dev-secret')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver').split(',')
 
-# CSRF and security settings for production (Fly.io, etc.)
+# CSRF and security settings for production (platform proxy / PaaS)
 CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://localhost:8000,http://127.0.0.1:8000').split(',')
 # By default do NOT force HTTPS in the app; allow the platform/proxy to terminate TLS.
 # Set the `SECURE_SSL_REDIRECT` env var to 'True' in production only if you know
@@ -28,7 +28,8 @@ SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'False') == 'True'
 # Don't force secure cookies unless explicitly enabled via env var.
 SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', 'False') == 'True'
 CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'False') == 'True'
-# Trust the proxy header from Fly.io (or other proxies) to detect HTTPS
+# Trust the proxy header from upstream proxies (set by many PaaS providers)
+# This allows Django to detect HTTPS when a reverse proxy/edge TLS terminator is used.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
@@ -90,7 +91,7 @@ CACHES = {
 # Default to database-backed sessions in production so sessions persist
 # across processes/instances (LocMemCache is per-process and will drop
 # sessions when the process changes or is restarted — this causes users to
-# appear logged out immediately after logging in on platforms like Fly.io).
+# appear logged out immediately after logging in on some PaaS platforms).
 if DEBUG:
     # For local development we keep the faster cache-backed sessions.
     SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
