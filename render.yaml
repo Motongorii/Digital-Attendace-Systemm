@@ -1,0 +1,24 @@
+# Render service template for Digital Attendance System
+# Replace placeholders (name, repo, branch) with your values and apply via Render UI or `render` CLI.
+services:
+  - type: web
+    name: digital-attendance-web
+    env: docker
+    repo: https://github.com/<your-org>/<your-repo>
+    branch: main
+    dockerfilePath: Dockerfile
+    autoDeploy: true
+    instanceType: starter
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: ALLOWED_HOSTS
+        sync: false
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false
+      - key: DEBUG
+        value: "False"
+        sync: false
+    # Note: Add FIREBASE credentials as a secret or env var in the Render dashboard. Do NOT commit JSON to the repo.
