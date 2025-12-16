@@ -27,6 +27,13 @@ if [ -n "${CREATE_SUPERUSER_USERNAME:-}" ]; then
   fi
 fi
 
+# Optionally populate demo data without shell access. Set CREATE_DEMO=true and optional DEMO_* env vars.
+if [ "${CREATE_DEMO:-}" = "true" ] || [ "${CREATE_DEMO:-}" = "1" ]; then
+  echo "CREATE_DEMO detected, populating demo data..."
+  python manage.py populate_demo || echo "populate_demo command failed"
+  echo "Demo population complete. Remove CREATE_DEMO and DEMO_* env vars from your service settings when done."
+fi
+
 PORT=${PORT:-8080}
 echo "Starting Gunicorn on 0.0.0.0:$PORT"
 exec gunicorn attendance_system.wsgi:application --bind 0.0.0.0:${PORT} --workers 3 --log-level info
