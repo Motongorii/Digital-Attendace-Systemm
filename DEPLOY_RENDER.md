@@ -45,6 +45,20 @@ python manage.py migrate --noinput
 python manage.py collectstatic --noinput
 ```
 
+Create admin without shell (for free plans)
+-----------------------------------------
+If you are on Render's free plan and can't access the Shell, you can create or update a superuser by adding temporary environment variables to the service and redeploying. The `release.sh` startup script will detect these and create the user automatically.
+
+Add the following environment variables in the Render dashboard (Service → Environment):
+
+- `CREATE_SUPERUSER_USERNAME`: e.g. `rizla`
+- `CREATE_SUPERUSER_PASSWORD`: e.g. a strong temporary password
+- `CREATE_SUPERUSER_EMAIL`: optional (defaults to `admin@example.com`)
+
+Then trigger a redeploy (Manual Deploy or push). After the deploy completes, "Created superuser" or "Updated superuser" will be logged. Remove these env vars immediately afterward to avoid storing credentials in the environment.
+
+Security note: Use a strong temporary password and rotate it immediately by logging in and changing the password in the admin UI.
+
 8) Media files
 - Local `MEDIA_ROOT` is not durable across instances. For production, configure Google Cloud Storage (`django-storages`) or S3 and set `DEFAULT_FILE_STORAGE` in settings using env vars. This repo already includes `google-cloud-storage` in `requirements.txt`.
 
