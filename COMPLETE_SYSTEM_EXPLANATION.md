@@ -8,10 +8,10 @@ This document provides a comprehensive explanation of every component in your Di
 
 Your system is built on:
 - **Backend**: Django 4.2.27 (Python web framework)
-- **Database**: SQLite (local) / PostgreSQL (production on Fly.io)
+- **Database**: SQLite (local) / PostgreSQL (production)
 - **Cloud**: Firebase Firestore (real-time data sync)
 - **Frontend**: HTML/CSS/JavaScript with responsive modals
-- **Deployment**: Fly.io (containerized Docker app)
+- **Deployment**: Containerized Docker app on your hosting platform
 
 ### High-Level Flow:
 ```
@@ -740,7 +740,7 @@ def create_session(request):
 
 **QR Code Contents**:
 ```
-https://digital-attendance-system.fly.dev/attend/a1b2c3d4-e5f6-47g8-h9i0-j1k2l3m4n5o6/
+https://<your-production-domain>/attend/<session_id>/
 ```
 
 **When Student Scans**:
@@ -795,7 +795,7 @@ Calculation: (10 / 12) × 100 = 83.33%
 | **CSRF Protection** | Django middleware + tokens | Prevent cross-site attacks |
 | **Session Auth** | Login required decorator | Only authenticated lecturers can create sessions |
 | **Password Hashing** | Django's PBKDF2 | Passwords encrypted in database |
-| **HTTPS** | Fly.io SSL | All traffic encrypted |
+| **HTTPS** | Platform-managed SSL | All traffic encrypted |
 | **Duplicate Prevention** | Unique constraints | Can't mark attendance twice |
 | **Firebase Credentials** | Environment variables | Never hardcoded in code |
 | **Rate Limiting** | (Optional) | Prevent brute force login |
@@ -812,14 +812,14 @@ python manage.py runserver        # Start local server
 # Visit http://127.0.0.1:8000/
 ```
 
-### Production (Fly.io)
+### Production (Hosting)
 ```bash
 git add -A
 git commit -m "Your message"
 git push origin main
 
-fly deploy                         # Builds Docker image and deploys
-# Runs migrations, collects static files, restarts app
+# Use your platform's deployment command to build and deploy (example: `fly deploy`)
+# The deployment should run migrations, collect static files, and restart the app
 ```
 
 **Dockerfile Process**:
@@ -1026,7 +1026,7 @@ Your Digital Attendance System is a **production-grade, full-stack application**
 ✅ **Cloud**: Firebase Firestore for real-time sync  
 ✅ **APIs**: AJAX endpoints + Portal API integration  
 ✅ **Frontend**: Responsive HTML/CSS/JavaScript modals  
-✅ **Deployment**: Containerized Docker on Fly.io  
+✅ **Deployment**: Containerized Docker on a hosting platform  
 ✅ **Performance**: Background threading, connection pooling, caching  
 ✅ **Security**: Encrypted passwords, HTTPS, input validation  
 ✅ **Reliability**: Dual-sync, fallback modes, error handling  
