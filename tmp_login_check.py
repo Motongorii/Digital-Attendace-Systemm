@@ -1,6 +1,8 @@
+# Temporary login check utility — use SITE_BASE_URL env var or default to localhost
+import os
 import requests
 
-BASE = 'http://127.0.0.1:8000'  # Use local dev server by default
+BASE = os.getenv('SITE_BASE_URL', 'http://127.0.0.1:8000')
 USERNAME = 'Motog'
 PASSWORD = '123456'
 

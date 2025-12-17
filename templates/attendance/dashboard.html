@@ -48,240 +48,32 @@
         content: '';
         position: absolute;
         top: 0;
-        <style>
-          .modal-backdrop {
-            display: none !important;
-            position: fixed !important;
-            inset: 0 !important;
-            background: rgba(0, 0, 0, 0.75) !important;
-            backdrop-filter: blur(3px);
-            align-items: center !important;
-            justify-content: center !important;
-            z-index: 1050 !important;
-            padding: 1rem !important;
-            overflow-y: auto !important;
-          }
-
-          .modal-backdrop[style*="display:flex"] {
-            display: flex !important;
-          }
-
-          .modal-content {
-            max-width: 600px !important;
-            width: 100% !important;
-            padding: 2.5rem !important;
-            margin: auto !important;
-            border: 3px solid #00ffe6 !important;
-            box-shadow: 0 0 40px rgba(0, 255, 242, 0.35), inset 0 0 30px rgba(0, 255, 242, 0.1) !important;
-            border-radius: 25px !important;
-            background: rgba(15, 23, 42, 0.95) !important;
-            animation: modalSlideIn 0.3s ease-out;
-          }
-
-          @keyframes modalSlideIn {
-            from {
-              opacity: 0;
-              transform: scale(0.95) translateY(-30px);
-            }
-            to {
-              opacity: 1;
-              transform: scale(1) translateY(0);
-            }
-          }
-
-          .modal-header {
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-            margin-bottom: 2rem !important;
-            padding-bottom: 1.5rem !important;
-            border-bottom: 2px solid rgba(0, 255, 242, 0.3) !important;
-          }
-
-          .modal-title {
-            color: #00ffe6 !important;
-            font-size: 2.2rem !important;
-            margin: 0 !important;
-            font-family: 'Orbitron', monospace !important;
-            font-weight: 900 !important;
-            text-shadow: 0 0 12px #00ffe6, 0 0 4px #fff !important;
-            letter-spacing: 1px !important;
-          }
-
-          .modal-close-btn {
-            background: rgba(255, 51, 102, 0.2) !important;
-            border: 2px solid #ff3366 !important;
-            color: #ff3366 !important;
-            font-size: 1.8rem !important;
-            cursor: pointer !important;
-            padding: 0.5rem !important;
-            width: 50px !important;
-            height: 50px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            transition: all 0.3s !important;
-            border-radius: 8px !important;
-          }
-
-          .modal-close-btn:hover {
-            background: rgba(255, 51, 102, 0.4) !important;
-            transform: scale(1.1) !important;
-          }
-
-          .modal-form-group {
-            margin-bottom: 1.75rem !important;
-          }
-
-          .modal-label {
-            color: #00ffe6 !important;
-            font-weight: 800 !important;
-            font-size: 1.15rem !important;
-            display: block !important;
-            margin-bottom: 0.75rem !important;
-            letter-spacing: 0.5px !important;
-            text-shadow: 0 0 4px #00ffe6 !important;
-          }
-
-          .modal-input,
-          .modal-select,
-          .modal-textarea {
-            width: 100% !important;
-            padding: 1rem !important;
-            font-size: 1.1rem !important;
-            background: rgba(0, 0, 0, 0.5) !important;
-            border: 2px solid #00ffe6 !important;
-            color: #fff !important;
-            border-radius: 12px !important;
-            transition: all 0.3s !important;
-            font-family: inherit !important;
-            box-sizing: border-box !important;
-          }
-
-          .modal-input:focus,
-          .modal-select:focus,
-          .modal-textarea:focus {
-            outline: none !important;
-            border-color: #00ffff !important;
-            box-shadow: 0 0 20px rgba(0, 255, 242, 0.5), inset 0 0 10px rgba(0, 255, 242, 0.1) !important;
-            background: rgba(0, 0, 0, 0.3) !important;
-          }
-
-          .modal-textarea {
-            min-height: 120px !important;
-            resize: vertical !important;
-          }
-
-          .modal-errors {
-            margin-bottom: 1.5rem !important;
-            padding: 1rem !important;
-            color: #ff3366 !important;
-            font-weight: 800 !important;
-            font-size: 1.05rem !important;
-            background: rgba(255, 51, 102, 0.1) !important;
-            border-left: 4px solid #ff3366 !important;
-            border-radius: 8px !important;
-            display: none !important;
-          }
-
-          .modal-actions {
-            display: flex !important;
-            gap: 1rem !important;
-            margin-top: 2rem !important;
-          }
-
-          .modal-btn {
-            flex: 1 !important;
-            padding: 1.2rem !important;
-            font-size: 1.15rem !important;
-            font-weight: 800 !important;
-            border: none !important;
-            border-radius: 12px !important;
-            cursor: pointer !important;
-            transition: all 0.3s !important;
-            letter-spacing: 0.5px !important;
-            text-transform: uppercase !important;
-          }
-
-          .modal-btn-submit {
-            background: linear-gradient(135deg, #00ffe6, #00ffff) !important;
-            color: #000 !important;
-            box-shadow: 0 0 20px rgba(0, 255, 242, 0.4) !important;
-          }
-
-          .modal-btn-submit:hover {
-            transform: translateY(-3px) !important;
-            box-shadow: 0 0 30px rgba(0, 255, 242, 0.6) !important;
-          }
-
-          .modal-btn-cancel {
-            background: rgba(255, 51, 102, 0.2) !important;
-            color: #ff3366 !important;
-            border: 2px solid #ff3366 !important;
-          }
-
-          .modal-btn-cancel:hover {
-            background: rgba(255, 51, 102, 0.3) !important;
-            transform: translateY(-3px) !important;
-          }
-
-          @media (max-width: 768px) {
-            .modal-content {
-              padding: 1.75rem !important;
-              border-radius: 16px !important;
-            }
-
-            .modal-title {
-              font-size: 1.75rem !important;
-            }
-
-            .modal-label {
-              font-size: 1rem !important;
-            }
-
-            .modal-input,
-            .modal-select,
-            .modal-textarea {
-              font-size: 1rem !important;
-              padding: 0.9rem !important;
-            }
-
-            .modal-btn {
-              padding: 1rem !important;
-              font-size: 1rem !important;
-            }
-
-            .modal-actions {
-              flex-direction: column !important;
-            }
-          }
-        </style>
         right: 0;
         width: 80px;
-        <div id="newUnitModal" class="modal-backdrop">
-          <div class="modal-content glass-card">
-            <div class="modal-header">
-              <h2 class="modal-title">+ Add New Unit</h2>
-              <button type="button" id="unit-modal-close" class="modal-close-btn">×</button>
-            </div>
+        height: 80px;
+        background: radial-gradient(circle, rgba(0, 255, 242, 0.1) 0%, transparent 70%);
+    }
+
+    .stat-value {
+        font-family: 'Orbitron', monospace;
         font-size: 2.5rem;
         font-weight: 700;
-              <div class="modal-form-group">
-                <label for="unit_code" class="modal-label">Unit Code</label>
-                <input name="code" id="unit_code" class="modal-input" placeholder="e.g., CS101" required />
+        color: var(--primary-cyan);
+        margin-bottom: 0.5rem;
+    }
 
-              <div class="modal-form-group">
-                <label for="unit_name" class="modal-label">Unit Name</label>
-                <input name="name" id="unit_name" class="modal-input" placeholder="e.g., Introduction to Programming" required />
+    .stat-label {
+        color: var(--text-secondary);
+        text-transform: uppercase;
         letter-spacing: 1px;
-              <div class="modal-form-group">
-                <label for="unit_description" class="modal-label">Description (Optional)</label>
-                <textarea name="description" id="unit_description" class="modal-textarea" placeholder="Add any notes or details about this unit..."></textarea>
+        font-size: 0.85rem;
+    }
+
     .section-title {
-              <div id="new-unit-errors" class="modal-errors"></div>
-              <div class="modal-actions">
-                <button type="submit" class="modal-btn modal-btn-submit">Create Unit</button>
-                <button type="button" id="new-unit-cancel" class="modal-btn modal-btn-cancel">Cancel</button>
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
         gap: 0.75rem;
     }
 
@@ -290,51 +82,41 @@
         width: 4px;
         height: 24px;
         background: linear-gradient(180deg, var(--primary-cyan), var(--primary-purple));
-        <div id="newSessionModal" class="modal-backdrop">
-          <div class="modal-content glass-card">
-            <div class="modal-header">
-              <h2 class="modal-title">📅 Create Session</h2>
-              <button type="button" id="session-modal-close" class="modal-close-btn">×</button>
-            </div>
-            <form id="new-session-form">
-              {% csrf_token %}
-              <div class="modal-form-group">
-                <label for="session_unit" class="modal-label">Unit</label>
-                <select name="unit" id="session_unit" class="modal-select" required>
-                  <option value="">-- Select a Unit --</option>
-                  {% for unit in units %}<option value="{{ unit.id }}">{{ unit.code }} - {{ unit.name }}</option>{% endfor %}
-                </select>
-              </div>
-              <div class="modal-form-group">
-                <label for="session_semester" class="modal-label">Semester</label>
-                <select name="semester" id="session_semester" class="modal-select" required>
-                  <option value="">-- Select Semester --</option>
-                  <option value="1">Semester 1</option>
-                  <option value="2">Semester 2</option>
-                </select>
-    .session-card:hover {
-              <div class="modal-form-group">
-                <label for="session_date" class="modal-label">Date</label>
-                <input type="date" name="date" id="session_date" class="modal-input" required />
+        border-radius: 2px;
+    }
 
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
-                <div class="modal-form-group" style="margin-bottom:0;">
-                  <label for="session_start_time" class="modal-label">Start Time</label>
-                  <input type="time" name="start_time" id="session_start_time" class="modal-input" required />
-                </div>
-                <div class="modal-form-group" style="margin-bottom:0;">
-                  <label for="session_end_time" class="modal-label">End Time</label>
-                  <input type="time" name="end_time" id="session_end_time" class="modal-input" required />
-                </div>
+    .sessions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .session-card {
+        padding: 1.5rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .session-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 40px rgba(0, 255, 242, 0.1);
+    }
+
+    .session-header {
+        display: flex;
+        justify-content: space-between;
         align-items: flex-start;
-              <div class="modal-form-group">
-                <label for="session_venue" class="modal-label">Venue (Room/Location)</label>
-                <input name="venue" id="session_venue" class="modal-input" placeholder="e.g., Room 101" required />
+        margin-bottom: 1rem;
+    }
+
     .session-unit {
-              <div id="new-session-errors" class="modal-errors"></div>
-              <div class="modal-actions">
-                <button type="submit" class="modal-btn modal-btn-submit">Create Session</button>
-                <button type="button" id="new-session-cancel" class="modal-btn modal-btn-cancel">Cancel</button>
+        font-family: 'Orbitron', monospace;
+        font-size: 1.2rem;
+        color: var(--primary-cyan);
+    }
+
+    .session-status {
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
         font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 1px;
@@ -607,32 +389,29 @@
 </div>
 
 
-<!-- New Unit Modal: Modern, Responsive Design -->
-<div id="newUnitModal" class="modal-backdrop" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:1050; padding:1rem; overflow-y:auto;">
-  <div class="modal-content glass-card" style="max-width:550px; width:100%; padding:2rem; border:2px solid var(--primary-cyan); box-shadow:0 0 30px rgba(0,255,242,0.25), inset 0 0 20px rgba(0,255,242,0.1); border-radius:20px; margin:auto;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
-      <h2 style="color:#00ffe6; font-size:1.8rem; margin:0; font-family:'Orbitron',monospace; font-weight:800; text-shadow:0 0 8px #00ffe6;">Add New Unit</h2>
-      <button type="button" id="unit-modal-close" style="background:none; border:none; color:#00ffe6; font-size:2rem; cursor:pointer; padding:0; width:40px; height:40px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;">�</button>
-    </div>
+<!-- New Unit Modal -->
+<!-- New Unit Modal: Inline form to add units without page reload --><div id="newUnitModal" class="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:1000;">
+  <div class="glass-card" style="max-width:520px; width:90%; padding:1.25rem;">
+    <h3 style="margin-top:0;">Add New Unit</h3>
     <form id="new-unit-form">
       {% csrf_token %}
-      <div class="form-group" style="margin-bottom:1.25rem;">
-        <label for="unit_code" style="color:#00ffe6; font-weight:700; font-size:1.05rem; display:block; margin-bottom:0.5rem;">Unit Code</label>
-        <input name="code" id="unit_code" class="form-input" placeholder="e.g., CS101" style="width:100%; padding:0.9rem; font-size:1.05rem; background:rgba(0,0,0,0.3); border:2px solid var(--primary-cyan); color:#fff; border-radius:8px;" required />
+      <div class="form-group">
+        <label for="unit_code">Unit Code</label>
+        <input name="code" id="unit_code" class="form-input" required />
       </div>
-      <div class="form-group" style="margin-bottom:1.25rem;">
-        <label for="unit_name" style="color:#00ffe6; font-weight:700; font-size:1.05rem; display:block; margin-bottom:0.5rem;">Unit Name</label>
-        <input name="name" id="unit_name" class="form-input" placeholder="e.g., Introduction to Programming" style="width:100%; padding:0.9rem; font-size:1.05rem; background:rgba(0,0,0,0.3); border:2px solid var(--primary-cyan); color:#fff; border-radius:8px;" required />
+      <div class="form-group">
+        <label for="unit_name">Unit Name</label>
+        <input name="name" id="unit_name" class="form-input" required />
       </div>
-      <div class="form-group" style="margin-bottom:1.5rem;">
-        <label for="unit_description" style="color:#00ffe6; font-weight:700; font-size:1.05rem; display:block; margin-bottom:0.5rem;">Description (Optional)</label>
-        <textarea name="description" id="unit_description" placeholder="Add any notes or details about this unit..." style="width:100%; padding:0.9rem; font-size:1.05rem; background:rgba(0,0,0,0.3); border:2px solid var(--primary-cyan); color:#fff; border-radius:8px; min-height:100px; font-family:inherit; resize:vertical;" rows="3"></textarea>
+      <div class="form-group">
+        <label for="unit_description" style="color:#00ffe6; font-weight:700;">Description (Optional - Clear Notes)</label>
+        <textarea name="description" id="unit_description" class="form-input" style="color:#ffffff; background:rgba(0,255,242,0.08); border:2px solid var(--primary-cyan);" rows="3"></textarea>
       </div>
-      <div id="new-unit-errors" style="margin-bottom:1rem; color:#ff3366; font-weight:700; font-size:1.1rem; display:none;"></div>
-      <div style="display:flex; gap:0.75rem; margin-top:1.5rem;">
-        <button type="submit" class="btn btn-primary" style="flex:1; padding:1rem; font-size:1.1rem; font-weight:700;">Create Unit</button>
-        <button type="button" id="new-unit-cancel" class="btn btn-secondary" style="flex:1; padding:1rem; font-size:1.1rem; font-weight:700;">Cancel</button>
+      <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+        <button type="submit" class="btn btn-primary">Create</button>
+        <button type="button" id="new-unit-cancel" class="btn btn-secondary">Cancel</button>
       </div>
+      <div id="new-unit-errors" style="margin-top:0.75rem;color:var(--error);font-weight:700;font-size:1.1rem;"></div>
     </form>
   </div>
 </div>
@@ -645,41 +424,47 @@
   }
   const openBtn = document.getElementById('open-new-unit');
   const modal = document.getElementById('newUnitModal');
-  const closeBtn = document.getElementById('unit-modal-close');
   const cancel = document.getElementById('new-unit-cancel');
   const form = document.getElementById('new-unit-form');
   const errorsEl = document.getElementById('new-unit-errors');
   const codeInput = document.getElementById('unit_code');
+  const nameInput = document.getElementById('unit_name');
+  const descInput = document.getElementById('unit_description');
 
+  // Open modal on button click
   if(openBtn) {
     openBtn.addEventListener('click', (e) => {
       e.preventDefault();
       modal.style.display = 'flex';
+      // Focus first field
       setTimeout(() => codeInput && codeInput.focus(), 100);
     });
   }
 
-  const closeModal = () => {
-    modal.style.display = 'none';
-    errorsEl.style.display = 'none';
-    errorsEl.innerHTML = '';
-    form.reset();
-  };
-
-  if(closeBtn) closeBtn.addEventListener('click', closeModal);
-  if(cancel) cancel.addEventListener('click', closeModal);
-
-  if(modal) {
-    modal.addEventListener('click', (e) => {
-      if(e.target === modal) closeModal();
+  // Close modal
+  if(cancel) {
+    cancel.addEventListener('click', () => {
+      modal.style.display = 'none';
+      errorsEl.innerHTML = '';
+      form.reset();
     });
   }
 
+  // Close modal on outside click
+  if(modal) {
+    modal.addEventListener('click', (e) => {
+      if(e.target === modal) {
+        modal.style.display = 'none';
+        errorsEl.innerHTML = '';
+      }
+    });
+  }
+
+  // Form submission
   if(form) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       errorsEl.innerHTML = '';
-      errorsEl.style.display = 'none';
 
       const formData = new FormData(form);
       const csrfToken = getCookie('csrftoken');
@@ -698,13 +483,24 @@
         const json = await resp.json();
 
         if(json.success) {
+          // Add unit to list
+          const unitsList = document.querySelector('.units-list');
+          if(unitsList) {
+            const tag = document.createElement('span');
+            tag.className = 'unit-tag';
+            tag.textContent = json.unit.code + ' - ' + json.unit.name;
+            unitsList.prepend(tag);
+          }
+          // Close modal and reset form
           modal.style.display = 'none';
           form.reset();
-          setTimeout(() => location.reload(), 500);
+          if(window.showNotification) {
+            showNotification('Unit created successfully!', 'success');
+          }
         } else {
           let html = '';
           if(json.error === 'not_a_lecturer') {
-            html = 'You are not registered as a lecturer. Please contact admin.';
+            html = '<div style="color:#ff0055;font-weight:900;font-size:1.15rem;">You are not registered as a lecturer. Please contact admin.</div>';
           } else if(json.errors) {
             for(const key in json.errors) {
               const msgs = json.errors[key];
@@ -715,69 +511,58 @@
               }
             }
           } else if(json.error) {
-            html = json.error;
+            html = '<div>Error: ' + json.error + '</div>';
           } else {
-            html = 'An error occurred. Please try again.';
+            html = '<div>An error occurred. Please try again.</div>';
           }
           errorsEl.innerHTML = html;
-          errorsEl.style.display = 'block';
         }
       } catch(err) {
         console.error('Network error:', err);
-        errorsEl.innerHTML = 'Network error. Please check your connection.';
-        errorsEl.style.display = 'block';
+        errorsEl.textContent = 'Network error. Please check your connection.';
       }
     });
   }
 })();
 </script>
 
-
-<!-- New Session Modal: Modern, Responsive Design -->
-<div id="newSessionModal" class="modal-backdrop" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:1050; padding:1rem; overflow-y:auto;">
-  <div class="modal-content glass-card" style="max-width:600px; width:100%; padding:2rem; border:2px solid var(--primary-magenta); box-shadow:0 0 30px rgba(255,0,128,0.2), inset 0 0 20px rgba(255,0,128,0.08); border-radius:20px; margin:auto;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
-      <h2 style="color:#ff0080; font-size:1.8rem; margin:0; font-family:'Orbitron',monospace; font-weight:800; text-shadow:0 0 8px #ff0080;">Create Session</h2>
-      <button type="button" id="session-modal-close" style="background:none; border:none; color:#ff0080; font-size:2rem; cursor:pointer; padding:0; width:40px; height:40px; display:flex; align-items:center; justify-content:center; transition:color 0.2s;">�</button>
-    </div>
+<!-- New Session Modal -->
+<div id="newSessionModal" class="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:1000;">
+  <div class="glass-card" style="max-width:520px; width:90%; padding:1.25rem;">
+    <h3 style="margin-top:0;">Create New Session</h3>
     <form id="new-session-form">
       {% csrf_token %}
-      <div class="form-group" style="margin-bottom:1.25rem;">
-        <label for="session_unit" style="color:#00ffe6; font-weight:700; font-size:1.05rem; display:block; margin-bottom:0.5rem;">Unit</label>
-        <select name="unit" id="session_unit" class="form-input" style="width:100%; padding:0.9rem; font-size:1.05rem; background:rgba(0,0,0,0.3); border:2px solid var(--primary-cyan); color:#fff; border-radius:8px;" required>
-          <option value="">-- Select Unit --</option>
+      <div class="form-group">
+        <label for="session_unit">Unit</label>
+        <select name="unit" id="session_unit" class="form-input" required>
           {% for unit in units %}<option value="{{ unit.id }}">{{ unit.code }} - {{ unit.name }}</option>{% endfor %}
         </select>
       </div>
-      <div class="form-group" style="margin-bottom:1.25rem;">
-        <label for="session_semester" style="color:#00ffe6; font-weight:700; font-size:1.05rem; display:block; margin-bottom:0.5rem;">Semester</label>
-        <select name="semester" id="session_semester" class="form-input" style="width:100%; padding:0.9rem; font-size:1.05rem; background:rgba(0,0,0,0.3); border:2px solid var(--primary-cyan); color:#fff; border-radius:8px;" required>
-          <option value="">-- Select Semester --</option>
-          <option value="1">Semester 1</option>
-          <option value="2">Semester 2</option>
-        </select>
+      <div class="form-group">
+        <label for="session_semester">Semester</label>
+        <input name="semester" id="session_semester" class="form-input" required />
       </div>
-      <div class="form-group" style="margin-bottom:1.25rem;">
-        <label for="session_date" style="color:#00ffe6; font-weight:700; font-size:1.05rem; display:block; margin-bottom:0.5rem;">Date</label>
-        <input type="date" name="date" id="session_date" class="form-input" style="width:100%; padding:0.9rem; font-size:1.05rem; background:rgba(0,0,0,0.3); border:2px solid var(--primary-cyan); color:#fff; border-radius:8px;" required />
+      <div class="form-group">
+        <label for="session_date">Date</label>
+        <input type="date" name="date" id="session_date" class="form-input" required />
       </div>
-      <div class="form-group" style="margin-bottom:1.25rem;">
-        <label for="session_start_time" style="color:#00ffe6; font-weight:700; font-size:1.05rem; display:block; margin-bottom:0.5rem;">Start Time</label>
-        <input type="time" name="start_time" id="session_start_time" class="form-input" style="width:100%; padding:0.9rem; font-size:1.05rem; background:rgba(0,0,0,0.3); border:2px solid var(--primary-cyan); color:#fff; border-radius:8px;" required />
+      <div class="form-group">
+        <label for="session_start_time">Start Time</label>
+        <input type="time" name="start_time" id="session_start_time" class="form-input" required />
       </div>
-      <div class="form-group" style="margin-bottom:1.25rem;">
-        <label for="session_end_time" style="color:#00ffe6; font-weight:700; font-size:1.05rem; display:block; margin-bottom:0.5rem;">End Time</label>
-        <input type="time" name="end_time" id="session_end_time" class="form-input" style="width:100%; padding:0.9rem; font-size:1.05rem; background:rgba(0,0,0,0.3); border:2px solid var(--primary-cyan); color:#fff; border-radius:8px;" required />
+      <div class="form-group">
+        <label for="session_end_time">End Time</label>
+        <input type="time" name="end_time" id="session_end_time" class="form-input" required />
       </div>
-      <div class="form-group" style="margin-bottom:1.5rem;">
-        <label for="session_venue" style="color:#00ffe6; font-weight:700; font-size:1.05rem; display:block; margin-bottom:0.5rem;">Venue (Room/Location)</label>
-        <input name="venue" id="session_venue" class="form-input" placeholder="e.g., Room 101" style="width:100%; padding:0.9rem; font-size:1.05rem; background:rgba(0,0,0,0.3); border:2px solid var(--primary-cyan); color:#fff; border-radius:8px;" required />
+      <div class="form-group">
+        <label for="session_venue">Venue</label>
+        <input name="venue" id="session_venue" class="form-input" required />
       </div>
-      <div id="new-session-errors" style="margin-bottom:1rem; color:#ff3366; font-weight:700; font-size:1.1rem; display:none;"></div>
-      <div style="display:flex; gap:0.75rem; margin-top:1.5rem;">
-        <button type="submit" class="btn btn-primary" style="flex:1; padding:1rem; font-size:1.1rem; font-weight:700;">Create Session</button>
-        <button type="button" id="new-session-cancel" class="btn btn-secondary" style="flex:1; padding:1rem; font-size:1.1rem; font-weight:700;">Cancel</button>
+      <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+        <button type="submit" class="btn btn-primary">Create</button>
+        <button type="button" id="new-session-cancel" class="btn btn-secondary">Cancel</button>
       </div>
+      <div id="new-session-errors" style="margin-top:0.75rem;color:var(--error);"></div>
     </form>
   </div>
 </div>
@@ -786,78 +571,50 @@
 (function(){
   const openBtn = document.querySelector('.btn-primary.btn-view');
   const modal = document.getElementById('newSessionModal');
-  const closeBtn = document.getElementById('session-modal-close');
   const cancel = document.getElementById('new-session-cancel');
   const form = document.getElementById('new-session-form');
   const errorsEl = document.getElementById('new-session-errors');
 
-  if(openBtn) {
-    openBtn.addEventListener('click', (e) => {
-      if(openBtn.textContent.includes('Create Session')) {
-        e.preventDefault();
-        modal.style.display = 'flex';
-      }
-    });
-  }
-
-  const closeModal = () => {
-    modal.style.display = 'none';
-    errorsEl.style.display = 'none';
-    errorsEl.innerHTML = '';
-    form.reset();
-  };
-
-  if(closeBtn) closeBtn.addEventListener('click', closeModal);
-  if(cancel) cancel.addEventListener('click', closeModal);
-
-  if(modal) {
-    modal.addEventListener('click', (e) => {
-      if(e.target === modal) closeModal();
-    });
-  }
-
-  if(form) {
-    form.addEventListener('submit', (e) => {
+  openBtn && openBtn.addEventListener('click', (e)=>{
+    if(openBtn.textContent.includes('Create Session')){
       e.preventDefault();
-      errorsEl.innerHTML = '';
-      errorsEl.style.display = 'none';
+      modal.style.display = 'flex';
+    }
+  });
+  cancel && cancel.addEventListener('click', ()=>{ modal.style.display='none'; errorsEl.innerHTML=''; form.reset(); });
 
-      const data = new FormData(form);
-      fetch('/session/create/', {
-        method: 'POST',
-        body: data,
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRFToken': document.cookie.match('(^|;)\s*csrftoken\s*=\s*([^;]+)')?.pop() || ''
-        }
-      }).then(r => r.json().then(j => ({ ok: r.ok, status: r.status, json: j }))).then(res => {
-        if(res.ok && res.json.success) {
-          modal.style.display = 'none';
-          form.reset();
-          location.reload();
-        } else {
-          let html = '';
-          if(res.json && res.json.errors) {
-            for(const k in res.json.errors) {
-              html += '<div><strong>' + k + ':</strong> ' + (Array.isArray(res.json.errors[k]) ? res.json.errors[k].join(', ') : res.json.errors[k]) + '</div>';
-            }
-          } else if(res.json && res.json.error) {
-            html = res.json.error;
-          } else {
-            html = 'An error occurred';
-          }
+  form && form.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    errorsEl.innerHTML='';
+    const data = new FormData(form);
+    fetch('/session/create/', {
+      method: 'POST',
+      body: data,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': document.cookie.match('(^|;)\s*csrftoken\s*=\s*([^;]+)')?.pop() || ''
+      }
+    }).then(r=>r.json().then(j=>({ok:r.ok, status:r.status, json:j}))).then(res=>{
+      if(res.ok && res.json.success){
+        modal.style.display='none';
+        form.reset();
+        // Optionally, reload or update session list
+        location.reload();
+      } else {
+        if(res.json && res.json.errors){
+          let html='';
+          for(const k in res.json.errors){ html += `<div><strong>${k}:</strong> ${res.json.errors[k].join(', ')}</div>` }
           errorsEl.innerHTML = html;
-          errorsEl.style.display = 'block';
+        } else if(res.json && res.json.error){
+          errorsEl.textContent = res.json.error;
+        } else {
+          errorsEl.textContent = 'An error occurred';
         }
-      }).catch(err => {
-        errorsEl.innerHTML = 'Network error';
-        errorsEl.style.display = 'block';
-      });
-    });
-  }
+      }
+    }).catch(err=>{ errorsEl.textContent='Network error'; });
+  });
 })();
 </script>
-
 {% endblock %}
 
 

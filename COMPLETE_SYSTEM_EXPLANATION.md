@@ -8,10 +8,10 @@ This document provides a comprehensive explanation of every component in your Di
 
 Your system is built on:
 - **Backend**: Django 4.2.27 (Python web framework)
--- **Database**: SQLite (local) / PostgreSQL (production on container hosting)
+- **Database**: SQLite (local) / PostgreSQL (production on Fly.io)
 - **Cloud**: Firebase Firestore (real-time data sync)
 - **Frontend**: HTML/CSS/JavaScript with responsive modals
--- **Deployment**: Container hosting (Docker) / platform of your choice
+- **Deployment**: Fly.io (containerized Docker app)
 
 ### High-Level Flow:
 ```
@@ -740,7 +740,7 @@ def create_session(request):
 
 **QR Code Contents**:
 ```
-https://your-deployment-url.example/attend/a1b2c3d4-e5f6-47g8-h9i0-j1k2l3m4n5o6/
+https://digital-attendance-system.fly.dev/attend/a1b2c3d4-e5f6-47g8-h9i0-j1k2l3m4n5o6/
 ```
 
 **When Student Scans**:
@@ -795,7 +795,7 @@ Calculation: (10 / 12) × 100 = 83.33%
 | **CSRF Protection** | Django middleware + tokens | Prevent cross-site attacks |
 | **Session Auth** | Login required decorator | Only authenticated lecturers can create sessions |
 | **Password Hashing** | Django's PBKDF2 | Passwords encrypted in database |
-| **HTTPS** | Platform SSL | All traffic encrypted |
+| **HTTPS** | Fly.io SSL | All traffic encrypted |
 | **Duplicate Prevention** | Unique constraints | Can't mark attendance twice |
 | **Firebase Credentials** | Environment variables | Never hardcoded in code |
 | **Rate Limiting** | (Optional) | Prevent brute force login |
@@ -812,13 +812,13 @@ python manage.py runserver        # Start local server
 # Visit http://127.0.0.1:8000/
 ```
 
-### Production (container hosting)
+### Production (Fly.io)
 ```bash
 git add -A
 git commit -m "Your message"
 git push origin main
 
-(Use your platform's deploy/push instructions, e.g., Docker image push & deploy)
+fly deploy                         # Builds Docker image and deploys
 # Runs migrations, collects static files, restarts app
 ```
 
@@ -1026,7 +1026,7 @@ Your Digital Attendance System is a **production-grade, full-stack application**
 ✅ **Cloud**: Firebase Firestore for real-time sync  
 ✅ **APIs**: AJAX endpoints + Portal API integration  
 ✅ **Frontend**: Responsive HTML/CSS/JavaScript modals  
-✅ **Deployment**: Containerized Docker on a chosen hosting platform  
+✅ **Deployment**: Containerized Docker on Fly.io  
 ✅ **Performance**: Background threading, connection pooling, caching  
 ✅ **Security**: Encrypted passwords, HTTPS, input validation  
 ✅ **Reliability**: Dual-sync, fallback modes, error handling  

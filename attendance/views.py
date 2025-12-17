@@ -2,7 +2,6 @@
 Views for Digital Attendance System.
 """
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
@@ -248,27 +247,16 @@ def create_session(request):
                 
                 # Add success message and redirect to session detail
                 messages.success(request, 'Session created successfully! QR code generated.')
-                # If this was an AJAX request, return JSON so the frontend doesn't try to
-                # parse HTML from a redirect (causes 'Network error' in the dashboard).
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({'success': True, 'session_id': str(session.id), 'redirect': reverse('session_detail', args=[session.id])})
                 return redirect('session_detail', session_id=session.id)
             
             except Exception as e:
-                # For AJAX requests return JSON with the error
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({'success': False, 'error': str(e)}, status=500)
                 messages.error(request, f'Error creating session: {str(e)}')
                 import traceback
                 traceback.print_exc()
                 return render(request, 'attendance/create_session.html', {'form': form})
         else:
             # Form is not valid
-                messages.error(request, 'Please correct the errors below.')
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    # Serialize form errors to JSON
-                    errors = {k: [str(x) for x in v] for k, v in form.errors.items()}
-                    return JsonResponse({'success': False, 'errors': errors}, status=400)
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = AttendanceSessionForm()
         form.fields['unit'].queryset = Unit.objects.filter(lecturer=lecturer)
@@ -339,18 +327,10 @@ def session_detail(request, session_id):
             'attendance_percentage': float(attendance_pct) if attendance_pct else 0,
         })
     attendance_count = len(attendance_records)
-    # Also include enrolled students for the unit so lecturers can see who is expected
-    enrolled_students = session.unit.enrolled_students.all().order_by('name')
-
-    # Prepare a set of admission numbers for quick presence checks
-    attending_admissions = {rec.get('admission_number') for rec in attendance_records if rec.get('admission_number')}
-
     return render(request, 'attendance/session_detail.html', {
         'session': session,
         'attendance_records': attendance_records,
         'attendance_count': attendance_count,
-        'enrolled_students': enrolled_students,
-        'attending_admissions': attending_admissions,
     })
 
 
@@ -409,22 +389,12 @@ def lecturer_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        remember = request.POST.get('remember')
         user = authenticate(request, username=username, password=password)
         print(f'[LOGIN DEBUG] username={username}, auth_result={bool(user)}')
         logger.info(f'[LOGIN DEBUG] username={username}, auth_result={bool(user)}')
         
         if user is not None:
             login(request, user)
-            # Persist session appropriately based on 'remember me'
-            if remember:
-                # 30 days
-                request.session.set_expiry(2592000)
-            else:
-                # Expires at browser close
-                request.session.set_expiry(0)
-            # Ensure session is saved so subsequent requests see the login state
-            request.session.save()
             session_key = request.session.session_key
             print(f'[LOGIN SUCCESS] username={username}, session_key={session_key}')
             logger.info(f'[LOGIN SUCCESS] username={username}, session_key={session_key}')
@@ -472,7 +442,6 @@ def api_status(request):
 
     session_id = request.GET.get('session_id')
     attendance_count = None
-    attendance_records = []
     if session_id:
         try:
             session = AttendanceSession.objects.get(id=session_id)
@@ -481,41 +450,18 @@ def api_status(request):
             if fb_service.is_connected:
                 try:
                     records = fb_service.get_session_attendance(str(session.id)) or []
-                    # Normalize records from Firebase (assume dicts)
-                    for r in records:
-                        attendance_records.append({
-                            'student_name': r.get('student_name'),
-                            'admission_number': r.get('admission_number'),
-                            'timestamp': r.get('timestamp'),
-                            'attendance_percentage': r.get('attendance_percentage', 0),
-                        })
                     count = len(records)
                 except Exception:
                     count = 0
             # Supplement with local DB records
             local_count = Attendance.objects.filter(session=session).count()
-            # Merge local DB records (freshest first) and deduplicate by admission_number
-            local_qs = Attendance.objects.filter(session=session).select_related('student').order_by('-timestamp')[:100]
-            seen = set(r.get('admission_number') for r in attendance_records if r.get('admission_number'))
-            for att in local_qs:
-                adm = att.student.admission_number
-                if adm in seen:
-                    continue
-                attendance_records.append({
-                    'student_name': att.student.name,
-                    'admission_number': adm,
-                    'timestamp': att.timestamp.isoformat(),
-                    'attendance_percentage': float(att.student.get_attendance_percentage(unit=session.unit) or 0),
-                })
-            attendance_count = len(attendance_records)
+            attendance_count = max(count, local_count)
         except AttendanceSession.DoesNotExist:
             attendance_count = None
     return JsonResponse({
         'firebase_connected': get_firebase_service().is_connected,
         'timestamp': timezone.now().isoformat(),
         'attendance_count': attendance_count,
-        'attendance_records': attendance_records,
-            'attendees': [student.name for student in session.unit.enrolled_students.all()],
     })
 
 

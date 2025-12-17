@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from attendance.models import Lecturer, Unit, AttendanceSession
 from attendance.qr_generator import generate_session_qr
 import datetime
+from django.conf import settings
 
 username = 'Motog'
 try:
@@ -64,8 +65,7 @@ print(f'{"✓ Created" if session_created else "✓ Exists"} Session: {session.i
 
 # Generate QR if not already generated
 if not session.qr_code or session.qr_code.size == 0:
-    # Use environment variable SITE_BASE_URL if set, otherwise default to localhost
-    base_url = os.environ.get('SITE_BASE_URL', 'http://127.0.0.1:8000')
+    base_url = getattr(settings, 'SITE_BASE_URL', 'http://127.0.0.1:8000')
     qr_file = generate_session_qr(session, base_url)
     session.qr_code.save(qr_file.name, qr_file)
     session.save()
@@ -73,6 +73,7 @@ if not session.qr_code or session.qr_code.size == 0:
 else:
     print(f'✓ QR already exists: {session.qr_code.name}')
 
+base_url = getattr(settings, 'SITE_BASE_URL', 'http://127.0.0.1:8000')
 print(f'\n✓ Session ready:')
 print(f'  URL: {base_url}/attend/{session.id}/')
 print(f'  QR file: {session.qr_code.name}')
