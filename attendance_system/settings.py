@@ -161,10 +161,32 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Firebase Configuration
 # Path to Firebase service account JSON. Prefer setting via env var for production.
 _env_firebase_path = os.getenv('FIREBASE_CREDENTIALS_PATH')
-if _env_firebase_path:
-    FIREBASE_CREDENTIALS_PATH = Path(_env_firebase_path)
-else:
-    FIREBASE_CREDENTIALS_PATH = BASE_DIR / 'firebase-credentials.json'
+FIREBASE_CREDENTIALS_PATH = Path(_env_firebase_path) if _env_firebase_path else BASE_DIR / 'firebase-credentials.json'
+
+# Support providing the entire service account JSON via env var:
+# - FIREBASE_CREDENTIALS_JSON: raw JSON string
+# - FIREBASE_CREDENTIALS_JSON_BASE64: base64-encoded JSON string
+firebase_json = os.getenv('FIREBASE_CREDENTIALS_JSON')
+if not firebase_json:
+    firebase_b64 = os.getenv('FIREBASE_CREDENTIALS_JSON_BASE64')
+    if firebase_b64:
+        try:
+            import base64
+            firebase_json = base64.b64decode(firebase_b64).decode('utf-8')
+        except Exception:
+            firebase_json = None
+
+if firebase_json:
+    try:
+        import json
+        # Validate JSON before writing
+        json.loads(firebase_json)
+        # Write to file only if new or different to avoid unnecessary writes
+        if not FIREBASE_CREDENTIALS_PATH.exists() or FIREBASE_CREDENTIALS_PATH.read_text() != firebase_json:
+            FIREBASE_CREDENTIALS_PATH.write_text(firebase_json)
+    except Exception:
+        # Invalid JSON: do not overwrite existing file
+        pass
 
 # Optional: Firebase Realtime Database URL (only for RTDB). Leave blank for Firestore.
 FIREBASE_DATABASE_URL = os.getenv('FIREBASE_DATABASE_URL', '')
