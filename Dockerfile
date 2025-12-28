@@ -25,9 +25,7 @@ RUN pip install --upgrade pip && \
 # Copy project
 COPY . .
 
-# Collect static files
-RUN python manage.py collectstatic --noinput || true
-
+# (Moved collectstatic to release-time to avoid needing runtime secrets during image build)
 # Copy and prepare release script (runs migrations before Gunicorn)
 COPY release.sh /app/release.sh
 RUN chmod +x /app/release.sh
