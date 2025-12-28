@@ -33,39 +33,45 @@
     .card-header p { color: var(--text-secondary); margin: 0; }
 
     .login-icon {
-        width: 64px;
-        height: 64px;
+        width: 56px;
+        height: 56px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         border-radius: 0.5rem;
         background: var(--primary-color);
         color: var(--text-inverse);
-        font-size: 1.25rem;
+        font-size: 1.05rem;
+        box-shadow: 0 6px 18px rgba(37,99,235,0.08);
     }
 
     /* Slight entrance animation */
     .card { transform: translateY(4px); transition: transform 220ms ease, box-shadow 220ms ease; }
     .card:hover { transform: translateY(0); box-shadow: var(--shadow-md); }
 
-    /* Keep the password toggle visually consistent with the theme */
-    .input-group .form-control {
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
+    /* fields and button styling for a clean professional look */
+    .form-control { background: var(--neutral-bg); border: 1px solid var(--neutral-border); border-radius: var(--radius-md); }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #764ba2 100%);
+        border: none;
+        box-shadow: 0 6px 18px rgba(102,110,234,0.12);
+        padding: 0.75rem 1rem;
+        font-weight: 700;
+        letter-spacing: 0.2px;
     }
 
     .input-group .btn-outline-secondary {
-        background-color: var(--secondary-light);
-        border-color: var(--neutral-border);
-        color: var(--text-primary);
+        background: transparent;
+        border-left: 1px solid var(--neutral-border);
+        color: var(--text-secondary);
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
-        transition: background-color 0.15s ease, color 0.15s ease;
-        min-width: 44px; /* bigger hit area for mobile */
+        min-width: 44px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 0.5rem 0.5rem;
+        padding: 0.5rem;
     }
 
     .input-group .btn-outline-secondary:focus { box-shadow: 0 0 0 0.15rem rgba(37, 99, 235, 0.08); }
@@ -170,6 +176,11 @@ document.addEventListener('DOMContentLoaded', function(){
                     <div class="form-check mb-3">
                         <input type="checkbox" id="remember" name="remember" class="form-check-input">
                         <label for="remember" class="form-check-label">Remember me</label>
+                    </div>
+
+                    <div class="forgot-row">
+                        <div></div>
+                        <a href="mailto:digitalassistance255@gmail.com">Forgot password?</a>
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100">
