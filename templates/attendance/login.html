@@ -84,6 +84,24 @@
         margin-top: 1rem;
     }
 
+    /* Password toggle button styling — match site theme */
+    .input-group .form-control {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .input-group .btn-outline-secondary {
+        background-color: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #1e293b;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    .input-group .btn-outline-secondary:focus {
+        box-shadow: 0 0 0 0.15rem rgba(37, 99, 235, 0.12);
+    }
+
     .login-footer {
         border-top: 1px solid #e2e8f0;
         padding: 1.5rem 2rem;
@@ -109,6 +127,26 @@
         }
     }
 </style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const toggleBtn = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    if(toggleBtn && passwordInput){
+        toggleBtn.addEventListener('click', function(e){
+            e.preventDefault();
+            const icon = this.querySelector('i');
+            const isPassword = passwordInput.getAttribute('type') === 'password';
+            passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+            this.setAttribute('aria-pressed', isPassword);
+        });
+    }
+});
+</script>
 {% endblock %}
 
 {% block content %}
@@ -150,14 +188,19 @@
 
                 <div class="form-group">
                     <label for="password" class="form-label required">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        class="form-control"
-                        placeholder="Enter your password"
-                        required
-                    >
+                    <div class="input-group">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="form-control"
+                            placeholder="Enter your password"
+                            required
+                        >
+                        <button class="btn btn-outline-secondary" id="togglePassword" type="button" aria-label="Toggle password visibility" aria-pressed="false">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-check">
