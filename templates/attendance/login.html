@@ -61,13 +61,33 @@
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
         transition: background-color 0.15s ease, color 0.15s ease;
+        min-width: 44px; /* bigger hit area for mobile */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem 0.5rem;
     }
 
     .input-group .btn-outline-secondary:focus { box-shadow: 0 0 0 0.15rem rgba(37, 99, 235, 0.08); }
 
-    /* eye icon animation */
-    #togglePassword i { transition: transform 180ms ease, color 120ms ease; }
+    /* eye icon animation + visibility */
+    #togglePassword i { transition: transform 180ms ease, color 120ms ease; font-size: 1.05rem; color: var(--text-secondary); }
+    .input-group .btn-outline-secondary:hover i { color: var(--primary-color); }
     #togglePassword.toggled i { transform: rotateX(180deg); color: var(--primary-color); }
+
+    /* Typography improvements */
+    .card { font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+    .card-header h3 { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.25rem; letter-spacing: -0.2px; }
+    .card-header p { font-size: 0.95rem; }
+
+    .form-label { font-weight: 700; color: var(--text-primary); }
+    .form-control { font-size: 1rem; padding: var(--spacing-md); }
+    .form-control::placeholder { color: var(--text-tertiary); opacity: 1; }
+
+    /* ensure high contrast for small screens */
+    @media (max-width: 480px) {
+        .input-group .btn-outline-secondary { min-width: 48px; }
+    }
 
     @media (max-width: 480px) {
         .login-hero { padding: var(--spacing-lg) 0 }
