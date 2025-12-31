@@ -275,69 +275,10 @@ For any issues:
 
 ---
 
-## Deploying to Railway (Environment variables) 🔧
+## Deployment
 
-Follow these exact environment variables and steps when deploying to Railway:
+For deployment, follow the instructions provided by your hosting provider and set the required environment variables and start commands.
 
-### Required variables
-- `DJANGO_SECRET_KEY` — strong secret (generate locally):
-  ```bash
-  python -c "import secrets; print(secrets.token_urlsafe(50))"
-  ```
-- `DEBUG` — `False` in production (string)
-- `DATABASE_URL` — created automatically when you add the PostgreSQL plugin in Railway
-- `ALLOWED_HOSTS` — comma-separated hosts, e.g. `your-app.railway.app`
-- `CSRF_TRUSTED_ORIGINS` — comma-separated origins with protocol, e.g. `https://your-app.railway.app`
-- `SITE_BASE_URL` — optional, e.g. `https://your-app.railway.app`
-
-### Firebase credentials (two options)
-Option A — Raw JSON (recommended for simplicity):
-- Set `FIREBASE_CREDENTIALS_JSON` to the full service account JSON string. Our `settings.py` will write it to `firebase-credentials.json` at startup.
-
-Option B — Base64 (safer for some UIs):
-- Base64-encode and set `FIREBASE_CREDENTIALS_JSON_BASE64`.
-
-PowerShell (Windows):
-```powershell
-$b=[Convert]::ToBase64String([IO.File]::ReadAllBytes("service-account.json")); $b | clip
-# paste into Railway variable `FIREBASE_CREDENTIALS_JSON_BASE64`
-```
-
-Bash / macOS:
-```bash
-base64 service-account.json | tr -d '\n' | pbcopy
-# paste into Railway variable `FIREBASE_CREDENTIALS_JSON_BASE64`
-```
-
-### Other optional security flags
-- `SECURE_SSL_REDIRECT` — `True` or `False`
-- `SESSION_COOKIE_SECURE` — `True` or `False`
-- `CSRF_COOKIE_SECURE` — `True` or `False`
-
-### Railway-specific steps
-1. Create Railway project → Deploy from GitHub → select repo & branch
-2. Add PostgreSQL plugin (Railway will set `DATABASE_URL` automatically)
-3. In Railway Project → Settings → Variables, add the environment variables listed above
-4. Start command (Railway or Procfile):
-```
-gunicorn attendance_system.wsgi --bind 0.0.0.0:$PORT
-```
-5. Post-deploy command (in Railway deployment settings):
-```
-python manage.py migrate && python manage.py collectstatic --noinput
-```
-6. Create a superuser with a one-off command if needed:
-```
-python manage.py createsuperuser
-```
-
-### Important notes
-- **DO NOT** commit `firebase-credentials.json` or any secrets to git. Remove with:
-```bash
-git rm --cached firebase-credentials.json
-git commit -m "Remove firebase credentials from repo"
-```
-- Add `firebase-credentials.json` and `db.sqlite3` to `.gitignore` (already present in this repo).
 - Railway filesystem is ephemeral: use Google Cloud Storage or S3 for persistent user uploads (the repo has `google-cloud-storage` in `requirements.txt`).
 - Rotate Firebase keys if they were committed publicly.
 

@@ -214,7 +214,7 @@ For students to scan QR codes from their phones:
    ```
    Access via: `http://YOUR_IP:8000/attend/SESSION_ID/`
 
-2. **Production**: Deploy to a cloud service (Railway, Heroku, etc.)
+2. **Production**: Deploy to a cloud hosting service (Heroku, etc.)
 
 ## 🛡️ Security Notes
 
