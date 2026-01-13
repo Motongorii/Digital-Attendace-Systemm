@@ -25,12 +25,9 @@ RUN pip install --upgrade pip && \
 # Copy project
 COPY . .
 
-# (Moved collectstatic to release-time to avoid needing runtime secrets during image build)
-# Release script: make executable if present (some build contexts may exclude it)
-RUN if [ -f /app/release.sh ]; then chmod +x /app/release.sh; fi
 
 # Expose port
 EXPOSE 8080
 
-# Run the release script (which runs migrations then starts Gunicorn)
-CMD ["/app/release.sh"]
+# Run migrations, collectstatic, then start Gunicorn directly (Render pattern)
+CMD bash -c 'python manage.py migrate --noinput && python manage.py collectstatic --noinput --clear && exec gunicorn attendance_system.wsgi:application --bind 0.0.0.0:${PORT:-8080} --workers 1 --threads 2 --timeout 120'
