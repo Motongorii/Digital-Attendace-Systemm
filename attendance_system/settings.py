@@ -189,6 +189,30 @@ if firebase_json:
 # Optional: Firebase Realtime Database URL (only for RTDB). Leave blank for Firestore.
 FIREBASE_DATABASE_URL = os.getenv('FIREBASE_DATABASE_URL', '')
 
+# Optional: Use Google Cloud Storage for media files in production.
+# Enable by setting USE_GCS=True and providing the bucket name and base64 service account JSON
+# env vars: USE_GCS, GS_BUCKET_NAME, GS_PROJECT_ID, GS_CREDENTIALS_JSON_BASE64
+if os.getenv('USE_GCS', 'False') == 'True':
+    # Add storages to installed apps when using GCS
+    INSTALLED_APPS += ['storages']
+    GS_BUCKET_NAME = os.getenv('GS_BUCKET_NAME', '')
+    DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+    GS_PROJECT_ID = os.getenv('GS_PROJECT_ID', '')
+    GS_CREDENTIALS_JSON_BASE64 = os.getenv('GS_CREDENTIALS_JSON_BASE64', '')
+
+    if GS_CREDENTIALS_JSON_BASE64:
+        try:
+            import base64, json
+            creds = base64.b64decode(GS_CREDENTIALS_JSON_BASE64).decode('utf-8')
+            credentials_path = BASE_DIR / 'gcs-credentials.json'
+            # Write credentials only if changed to avoid unnecessary writes
+            if not credentials_path.exists() or credentials_path.read_text() != creds:
+                credentials_path.write_text(creds)
+            os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = str(credentials_path)
+        except Exception:
+            # If credentials are invalid, fall back to whatever the environment provides
+            pass
+
 # Base URL for the site when running scripts or management commands outside a request
 # Set via env var `SITE_BASE_URL` in production, otherwise default to localhost.
 SITE_BASE_URL = os.getenv('SITE_BASE_URL', 'http://127.0.0.1:8000')

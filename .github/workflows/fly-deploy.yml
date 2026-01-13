@@ -1,0 +1,30 @@
+name: Deploy to Fly
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Flyctl
+        run: |
+          curl -L https://fly.io/install.sh | sh
+          echo "FLY_HOME=${HOME}/.fly" >> $GITHUB_ENV
+
+      - name: Authenticate with Fly
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          ${HOME}/.fly/bin/flyctl auth login --token "$FLY_API_TOKEN"
+
+      - name: Deploy to Fly
+        env:
+          FLY_APP_NAME: ${{ secrets.FLY_APP_NAME }}
+        run: |
+          ${HOME}/.fly/bin/flyctl deploy --app "$FLY_APP_NAME" --config fly.toml

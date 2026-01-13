@@ -1,5 +1,7 @@
 #!/bin/sh
+#!/bin/sh
 set -e
+set -x
 
 echo "Running migrations..."
 python manage.py migrate --noinput

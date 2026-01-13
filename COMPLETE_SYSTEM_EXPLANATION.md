@@ -818,7 +818,7 @@ git add -A
 git commit -m "Your message"
 git push origin main
 
-# Use your platform's deployment command to build and deploy (example: `fly deploy`)
+# Use your platform's deployment command to build and deploy (example: Render, Heroku, etc.)
 # The deployment should run migrations, collect static files, and restart the app
 ```
 
