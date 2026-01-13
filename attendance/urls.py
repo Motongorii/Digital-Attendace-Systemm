@@ -8,6 +8,7 @@ from .debug_views import debug_auth_check
 urlpatterns = [
     # Public pages
     path('', views.home, name='home'),
+    path('healthz/', views.healthz, name='healthz'),
     path('attend/<uuid:session_id>/', views.student_attend, name='student_attend'),
     
     # Auth

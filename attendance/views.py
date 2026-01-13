@@ -17,6 +17,11 @@ from django.core.cache import cache
 import logging
 logger = logging.getLogger(__name__)
 
+# Lightweight health endpoint used by load balancers and platform health checks
+# Minimal, no DB or external calls to ensure a quick 200/OK response.
+def healthz(request):
+    return HttpResponse('OK', status=200)
+
 from .models import Lecturer, Unit, AttendanceSession, Student, Attendance
 from .forms import AttendanceSessionForm, StudentAttendanceForm, UnitForm
 from .firebase_service import get_firebase_service

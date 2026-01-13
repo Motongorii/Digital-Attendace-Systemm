@@ -1,0 +1,34 @@
+# fly.toml - Fly app config for Digital Attendance System
+# Replace `app` value with your Fly app name or run `flyctl launch` to generate one.
+app = "digital-attendance"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+  # Do NOT store secrets here. Use `flyctl secrets set` instead.
+
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 500
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [services.http_checks]
+    interval = 10000
+    timeout = 2000
+    path = "/healthz/"
+    protocol = "http"
+    grace_period = 60000
+    method = "get"
