@@ -23,6 +23,16 @@ from .firebase_service import get_firebase_service
 from .sync_service import get_dual_sync_service
 from .qr_generator import generate_session_qr
 
+# Firebase Auth token-exchange and signup UI
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.contrib.auth import login as django_login
+from django.contrib.auth.models import User
+import firebase_admin
+from firebase_admin import auth as fb_auth
+import json
+from django.http import JsonResponse
+
 
 # bootstrap_admin endpoint removed — use management commands or `create_admin.py`.
 
@@ -136,6 +146,123 @@ def lecturer_dashboard(request):
         'lecturer': lecturer,
         'sessions': sessions,
         'units': units,
+    })
+
+
+@login_required
+def lecturer_usage_admin(request):
+    """Admin view to inspect lecturer usage counts (Firestore -> fallback to local DB)."""
+    # Restrict to staff users
+    if not request.user.is_staff:
+        messages.error(request, 'Permission denied')
+        return redirect('dashboard')
+
+    fb = get_firebase_service()
+    fb_error = None
+    lecturer_docs = []
+
+    if fb.is_connected:
+        try:
+            docs = fb.db.collection('lecturer_usage').stream()
+            for d in docs:
+                payload = d.to_dict() or {}
+                lecturer_docs.append({
+                    'lecturer_id': d.id,
+                    'lecturer_name': payload.get('lecturer_name'),
+                    'usage_count': payload.get('usage_count', 0),
+                    'last_active': payload.get('last_active'),
+                })
+        except Exception as e:
+            fb_error = str(e)
+
+    # Local DB fallback: lecturers with at least one session
+    from django.db.models import Count
+    local_lecturers = Lecturer.objects.annotate(session_count=Count('sessions')).filter(session_count__gt=0)
+    local_count = local_lecturers.count()
+
+    return render(request, 'admin/lecturer_usage.html', {
+        'lecturer_docs': lecturer_docs,
+        'fb_error': fb_error,
+        'local_count': local_count,
+        'local_lecturers': local_lecturers,
+    })
+
+
+@require_POST
+@csrf_exempt
+def firebase_login(request):
+    """Token-exchange endpoint: accept Firebase idToken, verify it, and create/login a Django user.
+
+    Request JSON: { "idToken": "..." }
+    """
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+    except Exception:
+        return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
+
+    id_token = data.get('idToken')
+    if not id_token:
+        return JsonResponse({'success': False, 'error': 'idToken required'}, status=400)
+
+    try:
+        decoded = fb_auth.verify_id_token(id_token)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': f'Invalid token: {str(e)}'}, status=400)
+
+    email = decoded.get('email')
+    email_verified = decoded.get('email_verified', False)
+    uid = decoded.get('uid')
+
+    # Security: require verified email
+    if not email or not email_verified:
+        return JsonResponse({'success': False, 'error': 'Email not verified or missing'}, status=403)
+
+    # Optional: restrict by domain
+    allowed_domain = None  # set to your domain string to restrict, or leave None
+    if allowed_domain and not email.endswith(f"@{allowed_domain}"):
+        return JsonResponse({'success': False, 'error': 'Email domain not allowed'}, status=403)
+
+    # Create or get Django user
+    user, created = User.objects.get_or_create(username=email, defaults={'email': email, 'first_name': decoded.get('name', '')})
+
+    # Ensure Lecturer exists
+    try:
+        lecturer = user.lecturer
+    except Lecturer.DoesNotExist:
+        lecturer = Lecturer.objects.create(user=user, staff_id=uid)
+
+    # Log the user in (Django session)
+    django_login(request, user)
+
+    # Optionally write minimal profile back to Firestore
+    try:
+        fb = get_firebase_service()
+        if fb.is_connected:
+            try:
+                # Lazy import to avoid circular deps
+                from firebase_admin import firestore as fb_fs
+                fb.db.collection('lecturer_profiles').document(uid).set({
+                    'email': email,
+                    'name': decoded.get('name', ''),
+                    'created_at': fb_fs.SERVER_TIMESTAMP if hasattr(fb_fs, 'SERVER_TIMESTAMP') else None,
+                }, merge=True)
+            except Exception:
+                pass
+    except Exception:
+        # Don't fail login on token verification errors
+        return JsonResponse({'success': False, 'error': 'token verification failed'}, status=400)
+
+
+def firebase_signup_page(request):
+    """Render a minimal signup page that uses Firebase Web SDK to create accounts.
+
+    The template expects a `firebase_config` dict in Django settings as JSON, or you can paste
+    your Firebase config directly into the template for local testing.
+    """
+    from django.conf import settings
+    firebase_config = getattr(settings, 'FIREBASE_CLIENT_CONFIG', None)
+    return render(request, 'attendance/firebase_signup.html', {
+        'firebase_config': json.dumps(firebase_config) if firebase_config else None
     })
 
 

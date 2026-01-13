@@ -1,0 +1,415 @@
+[
+{
+  "model": "attendance.lecturer",
+  "pk": 1,
+  "fields": {
+    "user": 1,
+    "staff_id": "STAFF001",
+    "department": "Computer Science",
+    "phone": "+254712345678"
+  }
+},
+{
+  "model": "attendance.lecturer",
+  "pk": 2,
+  "fields": {
+    "user": 2,
+    "staff_id": "TEST001",
+    "department": "Computer Science",
+    "phone": ""
+  }
+},
+{
+  "model": "attendance.lecturer",
+  "pk": 4,
+  "fields": {
+    "user": 4,
+    "staff_id": "STAFF_MOTOG",
+    "department": "Computer Science",
+    "phone": "+254700000000"
+  }
+},
+{
+  "model": "attendance.lecturer",
+  "pk": 5,
+  "fields": {
+    "user": 5,
+    "staff_id": "MOTOG",
+    "department": "",
+    "phone": ""
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 1,
+  "fields": {
+    "code": "SC0 300",
+    "name": "COMPONENT PROGRAMMING",
+    "lecturer": 1,
+    "description": ""
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 2,
+  "fields": {
+    "code": "CS101",
+    "name": "Introduction to Programming",
+    "lecturer": 2,
+    "description": ""
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 3,
+  "fields": {
+    "code": "SCO 306",
+    "name": "SOFTWARE PROJECT MANAGEMENT",
+    "lecturer": 1,
+    "description": "j"
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 5,
+  "fields": {
+    "code": "CS101_Motog",
+    "name": "Introduction to Programming",
+    "lecturer": 4,
+    "description": "Fundamentals of programming"
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 6,
+  "fields": {
+    "code": "TESTCLI_19352",
+    "name": "Test Unit From Client",
+    "lecturer": 5,
+    "description": "Created by internal test"
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 7,
+  "fields": {
+    "code": "TESTCLI_9396",
+    "name": "Test Unit From Client",
+    "lecturer": 5,
+    "description": "Created by internal test"
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 8,
+  "fields": {
+    "code": "TESTCLI_16484",
+    "name": "Test Unit From Client",
+    "lecturer": 5,
+    "description": "Created by internal test"
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 9,
+  "fields": {
+    "code": "TESTCLI_6880",
+    "name": "Test Unit From Client",
+    "lecturer": 5,
+    "description": "Created by internal test"
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 10,
+  "fields": {
+    "code": "TEST_AJAX_UNIT_7292",
+    "name": "Test AJAX Unit",
+    "lecturer": 2,
+    "description": "Testing AJAX endpoint"
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 11,
+  "fields": {
+    "code": "TESTCLI_3172",
+    "name": "Test Unit From Client",
+    "lecturer": 5,
+    "description": "Created by internal test"
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 12,
+  "fields": {
+    "code": "TESTUNIT_9541",
+    "name": "Test Unit",
+    "lecturer": 5,
+    "description": ""
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 13,
+  "fields": {
+    "code": "TESTCLI_8000",
+    "name": "Test Unit From Client",
+    "lecturer": 5,
+    "description": "Created by internal test"
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 14,
+  "fields": {
+    "code": "TESTUNIT_1534",
+    "name": "Test Unit",
+    "lecturer": 5,
+    "description": ""
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 15,
+  "fields": {
+    "code": "TESTCLI_10952",
+    "name": "Test Unit From Client",
+    "lecturer": 5,
+    "description": "Created by internal test"
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 16,
+  "fields": {
+    "code": "TESTUNIT_238",
+    "name": "Test Unit",
+    "lecturer": 5,
+    "description": ""
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 17,
+  "fields": {
+    "code": "TESTCLI_3336",
+    "name": "Test Unit From Client",
+    "lecturer": 5,
+    "description": "Created by internal test"
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 18,
+  "fields": {
+    "code": "TESTUNIT_2622",
+    "name": "Test Unit",
+    "lecturer": 5,
+    "description": ""
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 19,
+  "fields": {
+    "code": "TESTCLI_14832",
+    "name": "Test Unit From Client",
+    "lecturer": 5,
+    "description": "Created by internal test"
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 20,
+  "fields": {
+    "code": "TESTUNIT_3591",
+    "name": "Test Unit",
+    "lecturer": 5,
+    "description": ""
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 21,
+  "fields": {
+    "code": "TESTCLI_11636",
+    "name": "Test Unit From Client",
+    "lecturer": 5,
+    "description": "Created by internal test"
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 22,
+  "fields": {
+    "code": "TESTUNIT_9530",
+    "name": "Test Unit",
+    "lecturer": 5,
+    "description": ""
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 23,
+  "fields": {
+    "code": "SC0245",
+    "name": "PYTHON",
+    "lecturer": 1,
+    "description": ""
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 24,
+  "fields": {
+    "code": "TESTCLI_18440",
+    "name": "Test Unit From Client",
+    "lecturer": 5,
+    "description": "Created by internal test"
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 25,
+  "fields": {
+    "code": "TESTUNIT_4126",
+    "name": "Test Unit",
+    "lecturer": 5,
+    "description": ""
+  }
+},
+{
+  "model": "attendance.unit",
+  "pk": 26,
+  "fields": {
+    "code": "TESTCLI_12468",
+    "name": "Test Unit From Client",
+    "lecturer": 5,
+    "description": "Created by internal test"
+  }
+},
+{
+  "model": "attendance.attendancesession",
+  "pk": "012be247-b367-48ac-ac00-1a4cabedc223",
+  "fields": {
+    "unit": 1,
+    "lecturer": 1,
+    "date": "2025-12-04",
+    "start_time": "16:00:00",
+    "end_time": "19:00:00",
+    "venue": "ADB 203",
+    "lecturer_name": "Lenah Mia",
+    "class_year": "Year 2",
+    "is_active": true,
+    "created_at": "2025-12-04T09:25:42.549Z",
+    "qr_code": "qr_codes/qr_012be247-b367-48ac-ac00-1a4cabedc223.png",
+    "semester": 1,
+    "session_number": 2
+  }
+},
+{
+  "model": "attendance.attendancesession",
+  "pk": "3dbf09bb-9b17-43ce-97b3-3146394b1b97",
+  "fields": {
+    "unit": 5,
+    "lecturer": 4,
+    "date": "2025-12-09",
+    "start_time": "09:00:00",
+    "end_time": "10:30:00",
+    "venue": "Room 101",
+    "lecturer_name": "Motog",
+    "class_year": "Year 1",
+    "is_active": true,
+    "created_at": "2025-12-09T20:39:19.805Z",
+    "qr_code": "qr_codes/qr_3dbf09bb-9b17-43ce-97b3-3146394b1b97.png",
+    "semester": 1,
+    "session_number": 1
+  }
+},
+{
+  "model": "attendance.attendancesession",
+  "pk": "6209e254-bb04-4be7-8a46-acf232de9bcb",
+  "fields": {
+    "unit": 1,
+    "lecturer": 1,
+    "date": "2025-12-04",
+    "start_time": "13:16:00",
+    "end_time": "13:16:00",
+    "venue": "LAB 1",
+    "lecturer_name": "Anthony Junior",
+    "class_year": "Year 2",
+    "is_active": false,
+    "created_at": "2025-12-04T09:16:31.068Z",
+    "qr_code": "qr_codes/qr_6209e254-bb04-4be7-8a46-acf232de9bcb.png",
+    "semester": 1,
+    "session_number": 1
+  }
+},
+{
+  "model": "attendance.student",
+  "pk": 1,
+  "fields": {
+    "admission_number": "J17-3687-2023",
+    "name": "ANTHONY MOTONGORI",
+    "email": "",
+    "phone": "",
+    "created_at": "2025-12-04T09:49:36.201Z",
+    "updated_at": "2025-12-04T09:49:36.201Z",
+    "units": [
+      1
+    ]
+  }
+},
+{
+  "model": "attendance.student",
+  "pk": 2,
+  "fields": {
+    "admission_number": "J19-2023",
+    "name": "Jane Mary",
+    "email": "",
+    "phone": "",
+    "created_at": "2025-12-28T07:03:35.510Z",
+    "updated_at": "2025-12-28T07:03:35.510Z",
+    "units": [
+      1
+    ]
+  }
+},
+{
+  "model": "attendance.attendance",
+  "pk": 1,
+  "fields": {
+    "student": 1,
+    "session": "012be247-b367-48ac-ac00-1a4cabedc223",
+    "timestamp": "2025-12-04T09:49:36.218Z",
+    "synced_to_firebase": false,
+    "synced_to_portal": false,
+    "firebase_doc_id": null,
+    "portal_response": {
+      "success": false,
+      "skipped": true,
+      "message": "Portal sync disabled (no API URL configured)",
+      "document_id": null
+    }
+  }
+},
+{
+  "model": "attendance.attendance",
+  "pk": 2,
+  "fields": {
+    "student": 2,
+    "session": "012be247-b367-48ac-ac00-1a4cabedc223",
+    "timestamp": "2025-12-28T07:03:35.528Z",
+    "synced_to_firebase": false,
+    "synced_to_portal": false,
+    "firebase_doc_id": null,
+    "portal_response": {
+      "success": false,
+      "skipped": true,
+      "message": "Portal sync disabled (no API URL configured)",
+      "document_id": null
+    }
+  }
+}
+]

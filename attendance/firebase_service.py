@@ -107,58 +107,87 @@ class FirebaseService:
         return self.db is not None
 
     def save_attendance(self, session_id: str, student_data: dict) -> dict:
+        """
+        Record lecturer usage in Firebase instead of storing individual student records.
+
+        This method will:
+        - Ensure we **do not** write student-identifying records to Firebase.
+        - Increment a per-lecturer usage counter and set `last_active`.
+        - Store only minimal **session metadata** (no student list) under the lecturer's `sessions` subcollection.
+        """
         if not self.is_connected:
             # Firebase not available — indicate skipped remote sync so callers don't mark record as synced
             return {
                 "success": False,
                 "skipped": True,
-                "message": "Firebase not connected; attendance saved locally only",
+                "message": "Firebase not connected; lecturer usage not recorded remotely",
                 "document_id": None,
             }
         try:
-            attendance_record = {
+            # Use a stable lecturer identifier when available (lecturer_id). Fall back to normalized lecturer_name.
+            lecturer_id = student_data.get("lecturer_id") or (student_data.get("lecturer_name") or "unknown").lower().replace(" ", "_")
+            lecturer_name = student_data.get("lecturer_name") or "Unknown Lecturer"
+
+            # Update lecturer usage doc
+            lecturer_ref = self._db.collection("lecturer_usage").document(lecturer_id)
+            lecturer_ref.set({
+                "lecturer_name": lecturer_name,
+                "last_active": firestore.SERVER_TIMESTAMP,
+            }, merge=True)
+
+            # atomically increment usage_count
+            try:
+                lecturer_ref.update({"usage_count": firestore.Increment(1)})
+            except Exception:
+                # If update failed (e.g., doc did not exist in some older Firestore SDKs), set the field
+                lecturer_ref.set({"usage_count": 1}, merge=True)
+
+            # Store session metadata (no student details)
+            session_meta = {
                 "session_id": session_id,
-                "student_name": student_data.get("student_name"),
-                "admission_number": student_data.get("admission_number"),
                 "unit_code": student_data.get("unit_code"),
                 "unit_name": student_data.get("unit_name"),
-                "lecturer_name": student_data.get("lecturer_name"),
-                "date": student_data.get("date"),
-                "time_slot": student_data.get("time_slot"),
                 "venue": student_data.get("venue"),
                 "timestamp": datetime.now().isoformat(),
-                "marked_at": firestore.SERVER_TIMESTAMP,
             }
-            doc_ref = self._db.collection("attendance_records").add(attendance_record)
-            # `add` usually returns (DocumentReference, WriteResult)
-            try:
-                doc_ref_obj = doc_ref[0] if isinstance(doc_ref, (list, tuple)) else doc_ref
-                doc_id = getattr(doc_ref_obj, 'id', '')
-            except Exception:
-                doc_id = ''
-            session_ref = self._db.collection("sessions").document(session_id)
-            session_ref.collection("students").document(student_data.get("admission_number")).set(attendance_record)
-            return {"success": True, "document_id": doc_id, "message": "Attendance recorded successfully"} 
+            lecturer_ref.collection("sessions").document(str(session_id)).set(session_meta, merge=True)
+
+            return {"success": True, "document_id": lecturer_id, "message": "Lecturer usage recorded"}
         except Exception as e:
             return {"success": False, "error": str(e)}
 
     def get_session_attendance(self, session_id: str) -> list:
-        if not self.is_connected:
-            return []
-        try:
-            docs = self._db.collection("sessions").document(session_id).collection("students").stream()
-            return [doc.to_dict() for doc in docs]
-        except Exception:
-            return []
+        """
+        For privacy, Firebase does not store student lists. This returns an empty list.
+        Use local DB / portal API to view per-session student attendance.
+        """
+        return []
 
     def check_already_marked(self, session_id: str, admission_number: str) -> bool:
+        """
+        We do not track per-student marks in Firebase — this check should be done locally.
+        """
+        return False
+
+    def diagnose(self) -> dict:
+        """Return a small diagnostic summary about Firebase connectivity.
+
+        Useful keys:
+            - available: bool (is firebase_admin installed)
+            - connected: bool (is Firestore client available)
+            - collections_count: int (if readable)
+            - error: str (error message when a call failed)
+        """
+        res = {"available": FIREBASE_AVAILABLE, "connected": self.is_connected}
         if not self.is_connected:
-            return False
+            return res
         try:
-            doc = self._db.collection("sessions").document(session_id).collection("students").document(admission_number).get()
-            return doc.exists
-        except Exception:
-            return False
+            cols = [c.id for c in self._db.collections()]
+            res['collections_count'] = len(cols)
+            return res
+        except Exception as e:
+            res['error'] = str(e)
+            return res
 
 
 # Lazy singleton accessor

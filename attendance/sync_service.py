@@ -212,6 +212,7 @@ class DualSyncService:
                 'unit_code': session.unit.code,
                 'unit_name': session.unit.name,
                 'lecturer_name': session.lecturer.user.get_full_name(),
+                'lecturer_id': getattr(session.lecturer, 'staff_id', None),
                 'date': str(session.date),
                 'time_slot': f"{session.start_time} - {session.end_time}",
                 'venue': session.venue,

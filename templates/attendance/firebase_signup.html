@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Lecturer Signup{% endblock %}
+
+{% block content %}
+<section class="container">
+  <h1>Create Lecturer Account</h1>
+  <div id="messages"></div>
+
+  <form id="signup-form">
+    <div class="mb-3">
+      <label for="email">Email</label>
+      <input id="email" type="email" class="form-control" required />
+    </div>
+    <div class="mb-3">
+      <label for="password">Password</label>
+      <input id="password" type="password" class="form-control" required />
+    </div>
+    <button id="signup-btn" class="btn btn-primary">Create account</button>
+  </form>
+</section>
+
+{% block extra_js %}
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script>
+  // Provide your Firebase config here or set FIREBASE_CLIENT_CONFIG in Django settings
+  const firebaseConfig = {{ firebase_config|default:'null' }} || {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  const msg = (m, type='info') => document.getElementById('messages').innerHTML = `<div class="alert alert-${type}">${m}</div>`;
+
+  document.getElementById('signup-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    try {
+      const userCred = await auth.createUserWithEmailAndPassword(email, password);
+      // Send verification email
+      await userCred.user.sendEmailVerification();
+      msg('Account created. Please verify your email and then click "Sign In" to complete registration.', 'success');
+    } catch (err) {
+      msg('Error: ' + err.message, 'danger');
+    }
+  });
+
+  // Helper: sign-in and exchange token with backend
+  async function signInAndExchange() {
+    try {
+      const userCred = await auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('password').value);
+      const idToken = await userCred.user.getIdToken();
+      const r = await fetch('{% url "firebase_login" %}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken })
+      });
+      const j = await r.json();
+      if (j.success) {
+        window.location = '{% url "dashboard" %}';
+      } else {
+        msg('Login failed: ' + (j.error || JSON.stringify(j)), 'danger');
+      }
+    } catch (err) {
+      msg('Sign-in error: ' + err.message, 'danger');
+    }
+  }
+
+  // Add a small sign-in UI below the form
+  const signInBtn = document.createElement('button');
+  signInBtn.textContent = 'Sign In';
+  signInBtn.className = 'btn btn-secondary mt-2';
+  signInBtn.addEventListener('click', (e) => { e.preventDefault(); signInAndExchange(); });
+  document.querySelector('form').appendChild(signInBtn);
+</script>
+{% endblock %}
+{% endblock %}

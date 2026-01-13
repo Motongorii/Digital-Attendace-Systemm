@@ -30,4 +30,11 @@ urlpatterns = [
     path('debug/auth-check/', debug_auth_check, name='debug_auth_check'),
 
     # (bootstrap admin endpoint removed for security)
+
+    # Admin: lecturer usage dashboard (staff-only)
+    path('dashboard/lecturer-usage/', views.lecturer_usage_admin, name='lecturer_usage_admin'),
+
+    # Firebase Auth signup / token-exchange
+    path('auth/firebase-signup/', views.firebase_signup_page, name='firebase_signup'),
+    path('auth/firebase-login/', views.firebase_login, name='firebase_login'),
 ]

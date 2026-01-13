@@ -7,13 +7,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Database URL helper for production databases (Render, Heroku, etc.)
+# Database URL helper for production databases 
 import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# SECURITY WARNING
 import os
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'dev-secret')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'

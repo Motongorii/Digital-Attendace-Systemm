@@ -370,4 +370,49 @@ These diagrams illustrate:
 6. Environmental configuration
 7. Production deployment topology
 
+---
+
+## Firebase & Database Deep Dive 🔍
+
+### Quick summary
+- The app uses a **local relational DB** (Django models) for authoritative student/session/attendance data and **Firestore** (Firebase) as a realtime/remote store for attendance synchronization and cross-device deduplication.
+- Writes are performed locally first (fast response), then propagated asynchronously to Firebase and the Lecturer Portal via the DualSyncService.
+
+### Firestore structure (what to explain)
+- Top-level collection: `attendance_records` (flat timeline of attendance writes)
+- Session-scoped collection: `sessions/{session_id}/students/{admission_number}` — used to check "already marked" across devices
+- Each student doc contains: session_id, student_name, admission_number, unit_code, unit_name, lecturer_name, date, time_slot, venue, timestamp
+
+### Key components & responsibilities
+- `FirebaseService` (attendance/firebase_service.py)
+  - Lazy initialization from `FIREBASE_CREDENTIALS_JSON` or `FIREBASE_CREDENTIALS_PATH` or bundled `firebase-credentials.json`
+  - `save_attendance(session_id, student_data)` → writes to `attendance_records` and session subcollection and returns {success, document_id, message/error}
+  - `check_already_marked(session_id, admission_number)` → prevents duplicates
+
+- `DualSyncService` (attendance/sync_service.py)
+  - Orchestrates local DB write → Firebase → Portal
+  - Updates `Attendance` model fields: `synced_to_firebase`, `firebase_doc_id`, `synced_to_portal`, `portal_response`
+
+- Views & Signals
+  - `student_attend()` creates local `Attendance` immediately and spawns a background thread for `get_dual_sync_service().sync_attendance(...)`
+  - `post_save` signal on `Attendance` is another background sync safety-net (best-effort)
+
+### Sync semantics & idempotency
+- Local DB enforces uniqueness with `unique_together=(student, session)` to avoid duplicates at DB level.
+- Firestore checks use deterministic document IDs by admission number under a session subcollection — reads are used to dedupe cross-device marks.
+- If Firebase write fails, the local `Attendance` remains (and is not marked `synced_to_firebase`). The `firebase_doc_id` may still be set if an ID was returned.
+
+### Failure modes & how to explain them
+- Missing/invalid Firebase credentials → FirebaseService sets `.db=None` and `is_connected=False` (the app continues to function locally).
+- Network timeout / portal failure → PortalSyncService returns structured error in `portal_response` and `synced_to_portal` remains False.
+- Partial success (Firebase ok, Portal fail) → The `Attendance` record holds precise status for each target so operators can retry.
+
+### Operational commands & debugging
+- `python manage.py firebase_cleanup --session-id <id> --confirm` → backup and delete Firebase content safely (use `--dry-run` first)
+- Admin UI shows `firebase_doc_id` and `portal_response` (readonly) for auditing
+- Test connection: `test_app.py` includes a simple Firebase import & connection sanity check
+
+### Quick talking points (one-paragraph cheat sheet) ✨
+- "We write attendance locally first, then asynchronously sync to Firestore and our Lecturer Portal. Firestore is used for cross-device deduplication using `sessions/{id}/students/{admission_number}`, while the relational DB is the authoritative record and includes sync status fields so we can audit and retry failed syncs. Credentials come from env vars or the repo file; missing credentials do not break marking." 
+
 For detailed implementation, see `DUAL_SYNC_DOCUMENTATION.md` and `PORTAL_INTEGRATION_GUIDE.md`.

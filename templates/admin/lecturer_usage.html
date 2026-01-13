@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Lecturer Usage{% endblock %}
+
+{% block content %}
+<section class="container">
+  <h1>Lecturer Usage</h1>
+  {% if fb_error %}
+    <div class="alert alert-warning">Firebase error: {{ fb_error }}</div>
+  {% endif %}
+
+  <h2>Firestore (lecturer_usage)</h2>
+  {% if lecturer_docs %}
+    <table class="table">
+      <thead><tr><th>Lecturer ID</th><th>Name</th><th>Usage Count</th><th>Last Active</th></tr></thead>
+      <tbody>
+      {% for doc in lecturer_docs %}
+        <tr>
+          <td>{{ doc.lecturer_id }}</td>
+          <td>{{ doc.lecturer_name }}</td>
+          <td>{{ doc.usage_count }}</td>
+          <td>{{ doc.last_active }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No Firestore lecturer usage documents found (or Firebase unavailable).</p>
+  {% endif %}
+
+  <h2>Local DB</h2>
+  <p>Lecturers with sessions: {{ local_count }}</p>
+  <ul>
+  {% for lect in local_lecturers %}
+    <li>{{ lect.user.get_full_name }} — sessions: {{ lect.session_count }}</li>
+  {% endfor %}
+  </ul>
+</section>
+{% endblock %}
