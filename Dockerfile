@@ -26,9 +26,8 @@ RUN pip install --upgrade pip && \
 COPY . .
 
 # (Moved collectstatic to release-time to avoid needing runtime secrets during image build)
-# Copy and prepare release script (runs migrations before Gunicorn)
-COPY release.sh /app/release.sh
-RUN chmod +x /app/release.sh
+# Release script: make executable if present (some build contexts may exclude it)
+RUN if [ -f /app/release.sh ]; then chmod +x /app/release.sh; fi
 
 # Expose port
 EXPOSE 8080
