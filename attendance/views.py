@@ -135,18 +135,19 @@ def student_attend(request, session_id):
 @login_required
 def lecturer_dashboard(request):
     """Lecturer dashboard - manage sessions and view attendance."""
-    try:
-        lecturer = request.user.lecturer
-    except Lecturer.DoesNotExist:
-        messages.error(request, 'You are not registered as a lecturer.')
-        return redirect('home')
-    
-    # Optimize queries with select_related to avoid N+1 problem
-    sessions = AttendanceSession.objects.filter(lecturer=lecturer).select_related(
-        'unit', 'lecturer'
-    ).order_by('-created_at')
-    units = Unit.objects.filter(lecturer=lecturer)
-    
+    if request.user.is_superuser:
+        # Superuser: show all sessions and units
+        sessions = AttendanceSession.objects.all().select_related('unit', 'lecturer').order_by('-created_at')
+        units = Unit.objects.all()
+        lecturer = None
+    else:
+        try:
+            lecturer = request.user.lecturer
+        except Lecturer.DoesNotExist:
+            messages.error(request, 'You are not registered as a lecturer.')
+            return redirect('home')
+        sessions = AttendanceSession.objects.filter(lecturer=lecturer).select_related('unit', 'lecturer').order_by('-created_at')
+        units = Unit.objects.filter(lecturer=lecturer)
     return render(request, 'attendance/dashboard.html', {
         'lecturer': lecturer,
         'sessions': sessions,

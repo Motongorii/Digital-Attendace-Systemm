@@ -16,10 +16,10 @@ print("=" * 60)
 print("CREATING ADMIN USER FOR DIGITAL ATTENDANCE SYSTEM")
 print("=" * 60)
 
-# Create superuser
+# Create superuser (admin can access both admin panel and lecturer dashboard)
 username = "admin"
 email = "admin@attendance.com"
-password = "Admin@123456"
+password = "Admin@123456"  # This is the superuser and lecturer dashboard account
 
 try:
     # Check if user already exists
