@@ -1,5 +1,8 @@
 # 🚀✨ Digital Attendance System ✨🚀
 
+[![View on GitHub](https://img.shields.io/badge/GitHub-View%20Project-black?logo=github&style=for-the-badge)](https://github.com/Motongorii/Digital-Attendace-Systemm)
+[![Live on Render](https://img.shields.io/badge/Live%20Demo-Render-purple?style=for-the-badge)](https://render.com/)
+
 ![Render](https://img.shields.io/badge/Hosted%20on-Render-purple?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge)
 ![Django](https://img.shields.io/badge/Django-4.2-green?style=for-the-badge)
