@@ -147,7 +147,12 @@ if os.path.exists(BASE_DIR / 'static'):
     STATICFILES_DIRS = [BASE_DIR / 'static']
 else:
     STATICFILES_DIRS = []
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# On Vercel serverless, collectstatic/manifest generation is not guaranteed.
+# Use non-manifest storage there to avoid runtime 500 from missing manifest entries.
+if os.getenv('VERCEL') == '1':
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+else:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files
 MEDIA_URL = 'media/'
