@@ -4,8 +4,23 @@
 
 {% block extra_css %}
 <style>
+    :root {
+        --primary-cyan: var(--primary-color);
+        --primary-purple: #5b6fdc;
+        --glass-border: var(--neutral-border);
+        --success: #059669;
+        --error: #dc2626;
+    }
+
+    .glass-card {
+        background: var(--neutral-bg);
+        border: 1px solid var(--neutral-border);
+        border-radius: 14px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
     .creation-banner {
-        background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 255, 242, 0.2));
+        background: linear-gradient(135deg, #dcfce7, #eff6ff);
         border: 2px solid var(--success);
         border-radius: 15px;
         padding: 1.5rem;
@@ -78,7 +93,7 @@
     }
 
     .unit-code {
-        font-family: 'Orbitron', monospace;
+        font-family: 'Poppins', sans-serif;
         font-size: 2rem;
         color: var(--primary-cyan);
         margin-bottom: 0.5rem;
@@ -118,7 +133,7 @@
     }
 
     .info-item {
-        background: rgba(0, 0, 0, 0.3);
+        background: var(--neutral-bg-alt);
         padding: 1.25rem;
         border-radius: 12px;
         border: 1px solid var(--glass-border);
@@ -194,13 +209,13 @@
     }
 
     .qr-url {
-        font-family: 'Share Tech Mono', monospace;
+        font-family: 'Inter', sans-serif;
         font-size: 0.75rem;
         color: var(--text-secondary);
         word-break: break-all;
         margin-bottom: 1.5rem;
         padding: 1rem;
-        background: rgba(0, 0, 0, 0.3);
+        background: var(--neutral-bg-alt);
         border-radius: 8px;
     }
 
