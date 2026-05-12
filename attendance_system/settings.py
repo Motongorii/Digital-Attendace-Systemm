@@ -159,7 +159,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Firebase Configuration
 # Path to Firebase service account JSON. Prefer setting via env var for production.
 _env_firebase_path = os.getenv('FIREBASE_CREDENTIALS_PATH')
-FIREBASE_CREDENTIALS_PATH = Path(_env_firebase_path) if _env_firebase_path else BASE_DIR / 'firebase-credentials.json'
+if _env_firebase_path:
+    FIREBASE_CREDENTIALS_PATH = Path(_env_firebase_path)
+elif os.getenv('VERCEL') == '1':
+    # Vercel filesystem is read-only except /tmp.
+    FIREBASE_CREDENTIALS_PATH = Path('/tmp/firebase-credentials.json')
+else:
+    FIREBASE_CREDENTIALS_PATH = BASE_DIR / 'firebase-credentials.json'
 
 # Support providing the entire service account JSON via env var:
 # - FIREBASE_CREDENTIALS_JSON: raw JSON string

@@ -33,8 +33,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.contrib.auth import login as django_login
 from django.contrib.auth.models import User
-import firebase_admin
-from firebase_admin import auth as fb_auth
+# Firebase auth is optional at runtime; don't crash app import if unavailable.
+try:
+    import firebase_admin
+    from firebase_admin import auth as fb_auth
+except Exception:
+    firebase_admin = None
+    fb_auth = None
 import json
 from django.http import JsonResponse
 
@@ -209,6 +214,9 @@ def firebase_login(request):
     id_token = data.get('idToken')
     if not id_token:
         return JsonResponse({'success': False, 'error': 'idToken required'}, status=400)
+
+    if fb_auth is None:
+        return JsonResponse({'success': False, 'error': 'Firebase auth is not configured on server'}, status=503)
 
     try:
         decoded = fb_auth.verify_id_token(id_token)
