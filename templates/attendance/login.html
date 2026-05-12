@@ -17,6 +17,7 @@
     .card {
         max-width: 480px;
         margin: 0 auto;
+        border-radius: 16px;
     }
 
     .card-header {
@@ -30,6 +31,7 @@
     .card-header h3 {
         color: var(--primary-dark);
         margin-bottom: 0.25rem;
+        font-size: 2rem;
     }
 
     .card-header p { color: var(--text-secondary); margin: 0; }
@@ -99,6 +101,21 @@
 
     .card-footer {
         color: var(--text-secondary) !important;
+        font-weight: 500;
+    }
+
+    .form-check-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    body[data-theme="dark"] .card-header {
+        background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+    }
+
+    body[data-theme="dark"] .card-header h3,
+    body[data-theme="dark"] .card-header p {
+        color: #e5e7eb !important;
     }
 
     /* ensure high contrast for small screens */

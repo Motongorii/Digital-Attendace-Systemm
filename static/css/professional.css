@@ -4,10 +4,10 @@
    ======================================== */
 
 :root {
-    /* Color Palette - Muted, Professional, Calm */
-    --primary-color: #2563eb;           /* Professional Blue */
-    --primary-light: #dbeafe;           /* Very light blue */
-    --primary-dark: #1e40af;            /* Deep blue */
+    /* Light theme palette: white surfaces + dark-blue typography */
+    --primary-color: #1d4ed8;
+    --primary-light: #dbeafe;
+    --primary-dark: #1e3a8a;
     
     --secondary-color: #64748b;         /* Slate Gray */
     --secondary-light: #f1f5f9;         /* Light slate */
@@ -22,14 +22,14 @@
     --error-color: #dc2626;             /* Muted Red */
     --error-light: #fee2e2;             /* Very light red */
     
-    --neutral-bg: #ffffff;              /* Clean white */
-    --neutral-bg-alt: #f8fafc;          /* Off-white background */
-    --neutral-border: #e2e8f0;          /* Subtle border */
+    --neutral-bg: #ffffff;
+    --neutral-bg-alt: #f5f8ff;
+    --neutral-border: #dbe4f2;
     
-    --text-primary: #0f172a;            /* Deep navy (readable) */
-    --text-secondary: #475569;          /* Slate (secondary info) */
-    --text-tertiary: #94a3b8;           /* Light slate (muted) */
-    --text-inverse: #ffffff;            /* For dark backgrounds */
+    --text-primary: #0b1f44;
+    --text-secondary: #233b67;
+    --text-tertiary: #5f769f;
+    --text-inverse: #ffffff;
     
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
@@ -72,7 +72,7 @@ body {
     font-size: 0.9375rem;
     line-height: 1.6;
     color: var(--text-primary);
-    background-color: var(--neutral-bg-alt);
+    background: linear-gradient(180deg, #f7faff 0%, #eef4ff 100%);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -145,9 +145,9 @@ a:hover {
    ======================================== */
 
 .navbar {
-    background: var(--neutral-bg);
+    background: rgba(255, 255, 255, 0.92);
     border-bottom: 1px solid var(--neutral-border);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 6px 20px rgba(14, 30, 84, 0.08);
     padding: var(--spacing-md) var(--spacing-lg);
     position: sticky;
     top: 0;
@@ -229,7 +229,7 @@ a:hover {
     background: var(--neutral-bg);
     border: 1px solid var(--neutral-border);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 10px 30px rgba(19, 42, 90, 0.08);
     overflow: hidden;
     transition: all 0.2s ease;
 }
@@ -792,10 +792,9 @@ input[type="radio"] {
    ======================================== */
 
 footer {
-    /* Dark, high-contrast footer for readability */
-    background: linear-gradient(180deg, #0b1220 0%, #0f172a 100%);
-    color: #e6eef8; /* light text for contrast */
-    border-top: 2px solid rgba(255,255,255,0.06);
+    background: linear-gradient(180deg, #0f2248 0%, #0b1a3a 100%);
+    color: #e6eef8;
+    border-top: 1px solid rgba(255,255,255,0.08);
     padding: var(--spacing-2xl) var(--spacing-lg);
     margin-top: auto;
     box-shadow: 0 -6px 24px rgba(2,6,23,0.6);
@@ -1157,14 +1156,24 @@ a:focus-visible {
     }
 }
 
-/* Dark mode support (optional) */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --neutral-bg: #1e293b;
-        --neutral-bg-alt: #0f172a;
-        --neutral-border: #334155;
-        --text-primary: #f1f5f9;
-        --text-secondary: #cbd5e1;
-        --text-tertiary: #94a3b8;
-    }
+/* Explicit dark theme (used by base template toggle) */
+body[data-theme="dark"] {
+    --primary-color: #60a5fa;
+    --primary-light: #1e293b;
+    --primary-dark: #93c5fd;
+    --neutral-bg: #0f172a;
+    --neutral-bg-alt: #020617;
+    --neutral-border: #334155;
+    --text-primary: #e2e8f0;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+    background: linear-gradient(180deg, #020617 0%, #0b1220 100%);
+}
+
+body[data-theme="dark"] .navbar {
+    background: rgba(2, 6, 23, 0.9);
+}
+
+body[data-theme="dark"] .card {
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
 }

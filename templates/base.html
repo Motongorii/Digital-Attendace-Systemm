@@ -20,11 +20,11 @@
         }
         
         .navbar {
-            background: rgba(15, 23, 42, 0.95) !important;
+            background: rgba(255, 255, 255, 0.92) !important;
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid var(--neutral-border);
+            padding: 0.9rem 1.25rem;
+            box-shadow: 0 6px 18px rgba(13, 36, 82, 0.08);
         }
         
         .navbar-brand {
@@ -38,23 +38,23 @@
         }
         
         .nav-link {
-            color: #94a3b8 !important;
-            font-weight: 500;
+            color: var(--text-secondary) !important;
+            font-weight: 600;
             transition: all 0.3s ease;
             margin-left: 1rem;
             border-radius: 8px;
         }
         
         .nav-link:hover {
-            color: #e2e8f0 !important;
-            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary-dark) !important;
+            background: var(--primary-light);
             padding: 0.5rem 1rem;
         }
 
         .theme-toggle-btn {
-            border: 1px solid rgba(148, 163, 184, 0.35);
-            background: rgba(15, 23, 42, 0.35);
-            color: #e2e8f0;
+            border: 1px solid var(--neutral-border);
+            background: var(--neutral-bg-alt);
+            color: var(--text-secondary);
             border-radius: 9999px;
             width: 40px;
             height: 40px;
@@ -65,15 +65,7 @@
             cursor: pointer;
         }
         .theme-toggle-btn:hover { background: rgba(102, 126, 234, 0.2); }
-
-        body[data-theme="dark"] {
-            --neutral-bg: #0f172a;
-            --neutral-bg-alt: #020617;
-            --neutral-border: #334155;
-            --text-primary: #e2e8f0;
-            --text-secondary: #cbd5e1;
-            --text-tertiary: #94a3b8;
-        }
+        body[data-theme="dark"] .navbar { background: rgba(2, 6, 23, 0.9) !important; }
 
         main {
             flex: 1;
