@@ -109,24 +109,34 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Keep session open until explicitly lo
 SESSION_SAVE_EVERY_REQUEST = True  # Update session expiry on every request
 
 
-# Database: prefer `DATABASE_URL` (Render/Postgres), fallback to local SQLite
+# Database: prefer `DATABASE_URL`, fallback to local SQLite.
+# Guard against malformed URLs so startup does not crash on serverless.
 import os
 
-if 'DATABASE_URL' in os.environ:
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ['DATABASE_URL'],
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-    }
-else:
-    DATABASES = {
+def _sqlite_default():
+    return {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+
+database_url = os.environ.get('DATABASE_URL', '').strip()
+if database_url:
+    try:
+        DATABASES = {
+            'default': dj_database_url.config(
+                default=database_url,
+                conn_max_age=600,
+                conn_health_checks=True,
+            )
+        }
+    except Exception:
+        # Invalid DATABASE_URL (for example unresolved placeholders like PORT).
+        # Fall back to sqlite so the app can still boot and expose diagnostics.
+        DATABASES = _sqlite_default()
+else:
+    DATABASES = _sqlite_default()
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
