@@ -4,12 +4,28 @@
 
 {% block extra_css %}
 <style>
+    :root {
+        --glass-border: var(--neutral-border);
+    }
+
+    .glass-card {
+        background: var(--neutral-bg);
+        border: 1px solid var(--neutral-border);
+        border-radius: 14px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    .neon-text {
+        color: var(--primary-dark);
+        text-shadow: none;
+    }
+
     .create-container {
         min-height: calc(100vh - 100px);
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 2rem;
+        padding: clamp(1rem, 3vw, 2rem);
     }
 
     .create-card {
@@ -29,7 +45,7 @@
         width: 70px;
         height: 70px;
         margin: 0 auto 1.5rem;
-        background: linear-gradient(135deg, rgba(123, 44, 191, 0.2), rgba(255, 0, 255, 0.1));
+        background: linear-gradient(135deg, var(--primary-light), #eef2ff);
         border-radius: 20px;
         border: 1px solid var(--glass-border);
         display: flex;
@@ -40,7 +56,7 @@
     .create-icon svg {
         width: 35px;
         height: 35px;
-        stroke: var(--primary-magenta);
+        stroke: var(--primary-color);
     }
 
     .create-title {
@@ -54,9 +70,7 @@
 
     .submit-btn {
         width: 100%;
-        padding: 1.25rem;
-        font-size: 1.1rem;
-        margin-top: 1rem;
+        margin-top: 0.5rem;
     }
 
     .back-link {
@@ -67,17 +81,18 @@
         text-decoration: none;
         margin-bottom: 1.5rem;
         transition: color 0.3s ease;
+        min-height: 44px;
     }
 
     .back-link:hover {
-        color: var(--primary-cyan);
+        color: var(--primary-dark);
     }
 
     .corner-accent {
         position: absolute;
         width: 30px;
         height: 30px;
-        border: 2px solid var(--primary-magenta);
+        border: 2px solid var(--primary-color);
     }
 
     .corner-accent.tl {
@@ -144,7 +159,7 @@
                 <p class="create-subtitle">Create a course unit for attendance tracking</p>
             </div>
 
-            <form method="post">
+            <form method="post" class="form-stack">
                 {% csrf_token %}
                 
                 <div class="form-group">
@@ -157,7 +172,9 @@
                     {{ form.name }}
                 </div>
 
-                <div class="form-group"><label class="form-label" for="id_description" style="color:#00ffe6; font-weight:700;">Description (Optional)</label>{{ form.description }}
+                <div class="form-group">
+                    <label class="form-label" for="id_description">Description (optional)</label>
+                    {{ form.description }}
                 </div>
 
                 <button type="submit" class="btn btn-primary submit-btn">

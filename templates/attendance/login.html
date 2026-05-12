@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function(){
                     {% endfor %}
                 {% endif %}
 
-                <form method="POST" action="{% url 'login' %}">
+                <form method="POST" action="{% url 'login' %}" class="form-stack">
                     {% csrf_token %}
 
                     <div class="form-group">

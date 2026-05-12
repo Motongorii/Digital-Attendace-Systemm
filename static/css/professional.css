@@ -47,6 +47,10 @@
     --radius-md: 0.5rem;
     --radius-lg: 0.75rem;
     --radius-xl: 1rem;
+
+    /* Touch-friendly controls (WCAG / mobile HIG) */
+    --touch-target-min: 2.75rem; /* 44px */
+    --control-height: 3rem; /* 48px comfortable text field */
 }
 
 /* ========================================
@@ -189,6 +193,9 @@ a:hover {
     padding: var(--spacing-sm) var(--spacing-md);
     border-radius: var(--radius-md);
     transition: all 0.2s ease;
+    min-height: var(--touch-target-min);
+    display: inline-flex;
+    align-items: center;
 }
 
 .navbar-nav a:hover {
@@ -274,6 +281,16 @@ a:hover {
    FORMS & INPUTS
    ======================================== */
 
+.form-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.form-stack .form-group {
+    margin-bottom: 0;
+}
+
 .form-group {
     margin-bottom: var(--spacing-lg);
     display: flex;
@@ -296,9 +313,10 @@ a:hover {
 
 .form-control,
 .form-select,
-textarea {
-    padding: var(--spacing-md);
-    font-size: 0.95rem;
+textarea,
+.form-input {
+    padding: var(--spacing-md) 0.875rem;
+    font-size: 1rem;
     line-height: 1.5;
     color: var(--text-primary);
     background-color: var(--neutral-bg);
@@ -307,11 +325,20 @@ textarea {
     transition: all 0.2s ease;
     font-family: inherit;
     width: 100%;
+    min-height: var(--control-height);
+}
+
+textarea {
+    min-height: 7rem;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 0.9375rem;
 }
 
 .form-control:focus,
 .form-select:focus,
-textarea:focus {
+textarea:focus,
+.form-input:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: var(--shadow-focus);
@@ -320,22 +347,17 @@ textarea:focus {
 
 .form-control:disabled,
 .form-select:disabled,
-textarea:disabled {
+textarea:disabled,
+.form-input:disabled {
     background-color: var(--neutral-bg-alt);
     color: var(--text-tertiary);
     cursor: not-allowed;
 }
 
 .form-control::placeholder,
-.form-select::placeholder {
+.form-select::placeholder,
+.form-input::placeholder {
     color: var(--text-tertiary);
-}
-
-textarea {
-    resize: vertical;
-    min-height: 120px;
-    font-family: 'Monaco', 'Courier New', monospace;
-    font-size: 0.875rem;
 }
 
 /* Select styling */
@@ -351,8 +373,10 @@ textarea {
 /* Checkbox & Radio */
 input[type="checkbox"],
 input[type="radio"] {
-    width: 1rem;
-    height: 1rem;
+    width: 1.125rem;
+    height: 1.125rem;
+    min-width: 1.125rem;
+    min-height: 1.125rem;
     margin-right: var(--spacing-sm);
     accent-color: var(--primary-color);
     cursor: pointer;
@@ -390,16 +414,19 @@ input[type="radio"] {
 }
 
 .form-control.is-invalid,
-.form-select.is-invalid {
+.form-select.is-invalid,
+.form-input.is-invalid {
     border-color: var(--error-color);
 }
 
 .form-control.is-invalid:focus,
-.form-select.is-invalid:focus {
+.form-select.is-invalid:focus,
+.form-input.is-invalid:focus {
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
 }
 
-.form-control.is-invalid ~ .form-error {
+.form-control.is-invalid ~ .form-error,
+.form-input.is-invalid ~ .form-error {
     display: block;
 }
 
@@ -412,7 +439,8 @@ input[type="radio"] {
     align-items: center;
     justify-content: center;
     gap: var(--spacing-sm);
-    padding: var(--spacing-md) var(--spacing-lg);
+    padding: 0.625rem 1.25rem;
+    min-height: var(--touch-target-min);
     font-size: 0.95rem;
     font-weight: 600;
     border: none;
@@ -500,9 +528,12 @@ input[type="radio"] {
 
 .btn-outline:hover:not(:disabled) {
     background-color: var(--primary-light);
-}/* Button Sizes */
+}
+
+/* Button Sizes */
 .btn-sm {
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding: 0.5rem 0.875rem;
+    min-height: 2.25rem;
     font-size: 0.875rem;
 }
 
@@ -513,6 +544,13 @@ input[type="radio"] {
 
 .btn-block {
     width: 100%;
+}
+
+/* Full-width primary actions on narrow screens */
+@media (max-width: 576px) {
+    .btn-block-sm {
+        width: 100%;
+    }
 }
 
 /* ========================================
@@ -1062,6 +1100,22 @@ footer {
    RESPONSIVE
    ======================================== */
 
+/* Coarse pointers: slightly larger tap areas */
+@media (pointer: coarse) {
+    input[type="checkbox"],
+    input[type="radio"] {
+        width: 1.35rem;
+        height: 1.35rem;
+        min-width: 1.35rem;
+        min-height: 1.35rem;
+    }
+
+    .btn {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+}
+
 @media (max-width: 768px) {
     :root {
         --spacing-xl: 1.5rem;
@@ -1090,11 +1144,6 @@ footer {
 
     .card {
         border-radius: var(--radius-md);
-    }
-
-    .btn {
-        width: 100%;
-        justify-content: center;
     }
 
     .footer-content {
@@ -1176,4 +1225,11 @@ body[data-theme="dark"] .navbar {
 
 body[data-theme="dark"] .card {
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+}
+
+body[data-theme="dark"] .form-control:focus,
+body[data-theme="dark"] .form-select:focus,
+body[data-theme="dark"] textarea:focus,
+body[data-theme="dark"] .form-input:focus {
+    background-color: var(--neutral-bg);
 }
