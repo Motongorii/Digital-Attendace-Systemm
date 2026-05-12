@@ -2,6 +2,7 @@
 Django settings for Digital Attendance System.
 """
 import os
+import re
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -123,6 +124,9 @@ def _sqlite_default():
 
 database_url = os.environ.get('DATABASE_URL', '').strip()
 if database_url:
+    # Normalize common placeholder mistakes from copy/paste docs:
+    # e.g. postgres://user:pass@host:PORT/dbname -> remove :PORT token.
+    database_url = re.sub(r':PORT(?=[/?]|$)', '', database_url, flags=re.IGNORECASE)
     try:
         DATABASES = {
             'default': dj_database_url.config(
