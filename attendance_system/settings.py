@@ -95,7 +95,12 @@ if DEBUG:
     SESSION_CACHE_ALIAS = 'default'
 else:
     # In production use DB-backed sessions unless overridden by env var.
-    SESSION_ENGINE = os.getenv('SESSION_ENGINE', 'django.contrib.sessions.backends.db')
+    # On Vercel, prefer signed-cookie sessions by default to avoid hard
+    # dependency on `django_session` table during function invocation.
+    if os.getenv('VERCEL') == '1':
+        SESSION_ENGINE = os.getenv('SESSION_ENGINE', 'django.contrib.sessions.backends.signed_cookies')
+    else:
+        SESSION_ENGINE = os.getenv('SESSION_ENGINE', 'django.contrib.sessions.backends.db')
 
 # Session expiry and cookie settings
 # Increase session age to 30 days (2592000 seconds) so sessions don't expire during lecturer operations
