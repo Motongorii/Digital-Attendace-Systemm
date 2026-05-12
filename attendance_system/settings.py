@@ -166,6 +166,9 @@ else:
 # Use non-manifest storage there to avoid runtime 500 from missing manifest entries.
 if os.getenv('VERCEL') == '1':
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+    # Serve files directly from STATICFILES_DIRS on Vercel without a collectstatic step.
+    WHITENOISE_USE_FINDERS = True
+    WHITENOISE_AUTOREFRESH = True
 else:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
