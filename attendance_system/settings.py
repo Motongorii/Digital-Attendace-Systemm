@@ -176,9 +176,20 @@ if os.getenv('VERCEL') == '1':
 else:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Media files
+# Media files (QR codes, uploads). Vercel/AWS Lambda style hosts use a read-only
+# app dir; only /tmp is writable — default MEDIA_ROOT there avoids Errno 30.
 MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+_media_root_env = os.getenv('MEDIA_ROOT_PATH', '').strip()
+if _media_root_env:
+    MEDIA_ROOT = Path(_media_root_env)
+elif os.getenv('VERCEL') == '1':
+    MEDIA_ROOT = Path('/tmp/media')
+else:
+    MEDIA_ROOT = BASE_DIR / 'media'
+try:
+    MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
+except OSError:
+    pass
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

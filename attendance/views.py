@@ -23,6 +23,16 @@ logger = logging.getLogger(__name__)
 def healthz(request):
     return HttpResponse('OK', status=200)
 
+
+def _session_qr_png_bytes(request, session):
+    """Build PNG bytes for a session QR (uses public SITE_BASE_URL when set)."""
+    base = (getattr(settings, 'SITE_BASE_URL', '') or '').strip().rstrip('/')
+    if not base:
+        base = request.build_absolute_uri('/')[:-1]
+    qr_file = generate_session_qr(session, base)
+    qr_file.seek(0)
+    return qr_file.read()
+
 from .models import Lecturer, Unit, AttendanceSession, Student, Attendance
 from .forms import AttendanceSessionForm, StudentAttendanceForm, UnitForm
 from .firebase_service import get_firebase_service
@@ -568,9 +578,23 @@ def lecturer_logout(request):
 def download_qr(request, session_id):
     """Download QR code image."""
     session = get_object_or_404(AttendanceSession, id=session_id)
-    
+
+    img_bytes = None
     if session.qr_code:
-        img_bytes = session.qr_code.read()
+        try:
+            img_bytes = session.qr_code.read()
+        except (FileNotFoundError, OSError, ValueError):
+            img_bytes = None
+        if img_bytes is not None and len(img_bytes) == 0:
+            img_bytes = None
+
+    if not img_bytes:
+        try:
+            img_bytes = _session_qr_png_bytes(request, session)
+        except Exception:
+            img_bytes = None
+
+    if img_bytes:
         response = HttpResponse(img_bytes, content_type='image/png')
         # By default serve the image inline so it can be embedded in <img> tags even
         # when MEDIA files are not served by the platform. Add `?download=1` to force
@@ -580,7 +604,7 @@ def download_qr(request, session_id):
         else:
             response['Content-Disposition'] = 'inline'
         return response
-    
+
     messages.error(request, 'QR code not found.')
     return redirect('session_detail', session_id=session.id)
 
