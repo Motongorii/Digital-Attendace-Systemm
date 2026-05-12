@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from django.conf import settings
+from django.db import DatabaseError
 import json
 import threading
 from django.core.cache import cache
@@ -528,23 +529,30 @@ def lecturer_login(request):
         return redirect('dashboard')
     
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        print(f'[LOGIN DEBUG] username={username}, auth_result={bool(user)}')
-        logger.info(f'[LOGIN DEBUG] username={username}, auth_result={bool(user)}')
-        
-        if user is not None:
-            login(request, user)
-            session_key = request.session.session_key
-            print(f'[LOGIN SUCCESS] username={username}, session_key={session_key}')
-            logger.info(f'[LOGIN SUCCESS] username={username}, session_key={session_key}')
-            messages.success(request, f'Welcome back, {user.get_full_name() or user.username}!')
-            return redirect('dashboard')
-        else:
+        username = (request.POST.get('username') or '').strip()
+        password = request.POST.get('password') or ''
+        try:
+            user = authenticate(request, username=username, password=password)
+            print(f'[LOGIN DEBUG] username={username}, auth_result={bool(user)}')
+            logger.info(f'[LOGIN DEBUG] username={username}, auth_result={bool(user)}')
+
+            if user is not None:
+                login(request, user)
+                session_key = request.session.session_key
+                print(f'[LOGIN SUCCESS] username={username}, session_key={session_key}')
+                logger.info(f'[LOGIN SUCCESS] username={username}, session_key={session_key}')
+                messages.success(request, f'Welcome back, {user.get_full_name() or user.username}!')
+                return redirect('dashboard')
+
             print(f'[LOGIN FAILED] username={username}, invalid credentials')
             logger.warning(f'[LOGIN FAILED] username={username}, invalid credentials')
             messages.error(request, 'Invalid username or password.')
+        except DatabaseError as e:
+            logger.exception(f'[LOGIN DB ERROR] username={username} error={e}')
+            messages.error(request, 'Login is temporarily unavailable. Please try again in a moment.')
+        except Exception as e:
+            logger.exception(f'[LOGIN ERROR] username={username} error={e}')
+            messages.error(request, 'An unexpected error occurred during sign in. Please try again.')
     
     return render(request, 'attendance/login.html')
 

@@ -23,6 +23,8 @@
         background: linear-gradient(135deg, var(--primary-light) 0%, #f8fbff 100%);
         border-bottom: 1px solid var(--neutral-border);
         padding: var(--spacing-lg);
+        display: block;
+        text-align: center;
     }
 
     .card-header h3 {
@@ -50,7 +52,12 @@
     .card:hover { transform: translateY(0); box-shadow: var(--shadow-md); }
 
     /* fields and button styling for a clean professional look */
-    .form-control { background: var(--neutral-bg); border: 1px solid var(--neutral-border); border-radius: var(--radius-md); }
+    .form-control {
+        background: var(--neutral-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--neutral-border);
+        border-radius: var(--radius-md);
+    }
 
     .btn-primary {
         background: linear-gradient(135deg, var(--primary-color) 0%, #764ba2 100%);
@@ -88,7 +95,11 @@
 
     .form-label { font-weight: 700; color: var(--text-primary); }
     .form-control { font-size: 1rem; padding: var(--spacing-md); }
-    .form-control::placeholder { color: var(--text-tertiary); opacity: 1; }
+    .form-control::placeholder { color: var(--text-secondary); opacity: 0.92; }
+
+    .card-footer {
+        color: var(--text-secondary) !important;
+    }
 
     /* ensure high contrast for small screens */
     @media (max-width: 480px) {
